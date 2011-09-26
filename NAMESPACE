@@ -1,0 +1,10 @@
+useDynLib(rzmq)
+
+export(
+       init.context,
+       init.socket,
+       bind.socket,
+       connect.socket,
+       send.socket,
+       receive.socket
+       )
