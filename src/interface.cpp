@@ -99,6 +99,7 @@ SEXP bindSocket(SEXP socket_, SEXP address_) {
 
   if(TYPEOF(address_) != STRSXP) {
     std::cerr << "address type must be a string." << std::endl;
+    UNPROTECT(1);
     return R_NilValue;
   }
 
@@ -109,6 +110,7 @@ SEXP bindSocket(SEXP socket_, SEXP address_) {
     LOGICAL(ans)[0] = 0;
   }
 
+  UNPROTECT(1);
   return ans;
 }
 
@@ -118,6 +120,7 @@ SEXP connectSocket(SEXP socket_, SEXP address_) {
 
   if(TYPEOF(address_) != STRSXP) {
     std::cerr << "address type must be a string." << std::endl;
+    UNPROTECT(1);
     return R_NilValue;
   }
   try {
@@ -127,21 +130,23 @@ SEXP connectSocket(SEXP socket_, SEXP address_) {
     LOGICAL(ans)[0] = 0;
   }
 
+  UNPROTECT(1);
   return ans;
 }
 
 SEXP sendSocket(SEXP socket_, SEXP data_) {
   SEXP ans; PROTECT(ans = allocVector(LGLSXP,1));
-  if(TYPEOF(data_) != STRSXP) {
-    std::cerr << "data type must be a string." << std::endl;
+  if(TYPEOF(data_) != RAWSXP) {
+    std::cerr << "data type must be raw (RAWSXP)." << std::endl;
     return R_NilValue;
   }
 
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(R_ExternalPtrAddr(socket_));
   zmq::message_t msg (length(data_));
-  memcpy(msg.data(), CHAR(STRING_ELT(data_,0)), length(data_));
+  memcpy(msg.data(), RAW(data_), length(data_));
   bool status = socket->send(msg);
   LOGICAL(ans)[0] = static_cast<int>(status);
+  UNPROTECT(1);
   return ans;
 }
 
@@ -152,8 +157,8 @@ SEXP receiveSocket(SEXP socket_) {
   bool status = socket->recv(&msg);
 
   if(status) {
-    PROTECT(ans = allocVector(STRSXP,msg.size()));
-    memcpy(const_cast<char*>(CHAR(STRING_ELT(ans,0))),msg.data(),msg.size());
+    PROTECT(ans = allocVector(RAWSXP,msg.size()));
+    memcpy(RAW(ans),msg.data(),msg.size());
     UNPROTECT(1);
     return ans;
   }
