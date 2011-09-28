@@ -43,3 +43,7 @@ receive.socket <- function(socket) {
 create.sink <- function(address, num_items) {
     .Call("createSink", address, as.integer(num_items), PACKAGE="rzmq")
 }
+
+get.sink.results <- function(sink) {
+    .Call("getSinkResults", sink, PACKAGE="rzmq")
+}

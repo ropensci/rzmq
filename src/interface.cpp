@@ -195,3 +195,8 @@ SEXP createSink(SEXP address_, SEXP num_items_) {
   UNPROTECT(1);
   return sink_;
 }
+
+SEXP getSinkResults(SEXP sink_) {
+  Sink* sink = reinterpret_cast<Sink*>(R_ExternalPtrAddr(sink_));
+  return sink->getResults();
+}

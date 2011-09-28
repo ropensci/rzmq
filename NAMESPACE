@@ -7,5 +7,6 @@ export(
        connect.socket,
        send.socket,
        receive.socket,
-       create.sink
+       create.sink,
+       get.sink.results
        )

@@ -29,12 +29,13 @@ class Sink {
 private:
   typedef std::vector<char*> container;
   container results_;
+  std::vector<size_t> msg_sizes_;
   const char* address_;
-  const size_t num_items_;  
+  const size_t num_items_;
   pthread_t worker_;
 public:
   Sink(const char* address, size_t num_items):
-    address_(address), num_items_(num_items)
+    address_(address), num_items_(num_items) //, results_(num_items), msg_sizes_(num_items)
   {
     pthread_create(&worker_, NULL, &Sink::start_thread, static_cast<void*>(this));
   }
@@ -64,19 +65,33 @@ public:
       return;
     }
 
-    std::cout << "listening" << std::endl;
-    do {
+    while(msgs_received < num_items_) {
       zmq::message_t msg;
       receiver.recv(&msg);
+
+      msg_sizes_.push_back(msg.size());
       char* dest = new char[msg.size()];
       // if(dest == NULL) panic;
       results_.push_back(dest);
       memcpy(dest,msg.data(),msg.size());
       ++msgs_received;
-      std::cout << "received:" << msgs_received << std::endl;
-    } while(msgs_received < num_items_);
+    }
+  }
 
-    zmq_close (receiver);
+  SEXP getResults() {
+    SEXP ans, x;
+    while(results_.size() < num_items_) {
+      sleep(1);
+    }
+    PROTECT(ans = allocVector(VECSXP,results_.size()));
+    for(size_t i = 0; i < results_.size(); i++) {
+      PROTECT(x = allocVector(RAWSXP,msg_sizes_[i]));
+      memcpy(RAW(x),results_[i],msg_sizes_[i]);
+      SET_VECTOR_ELT(ans,i,x);
+      UNPROTECT(1);
+    }
+    UNPROTECT(1);
+    return ans;
   }
 };
 
