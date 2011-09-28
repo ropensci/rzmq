@@ -12,7 +12,7 @@ Introduction
 Purpose
 =======
 
-rzmq is a binding for ZMQ (http://www.zeromq.org/).
+rzmq is an R binding for ZMQ (http://www.zeromq.org/).
 
 
 Features
@@ -30,9 +30,9 @@ rzmq is a message queue for serialized R objects.
 Usage
 =====
 
-A minimal example of remote execution::
+A minimal example of remote execution.
 
-	##execute this R script on the remote server
+execute this R script on the remote server::
 	
 	#!/usr/bin/env Rscript
 	library(rzmq)
