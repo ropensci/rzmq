@@ -1,7 +1,7 @@
 Package: rzmq
-Title: R interface for zmq (http://www.zeromq.org/)
-Version: 0.0.2
+Title: R binding for zmq (http://www.zeromq.org/)
+Version: 0.1.0
 Maintainer: Whit Armstrong <armstrong.whit@gmail.com>
 Author: Whit Armstrong <armstrong.whit@gmail.com>
-Description: R interface for zmq
+Description: R binding for zmq
 License: GPL-3
