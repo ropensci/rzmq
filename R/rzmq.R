@@ -39,3 +39,7 @@ receive.socket <- function(socket) {
     ans <- .Call("receiveSocket", socket, PACKAGE="rzmq")
     unserialize(ans)
 }
+
+create.sink <- function(address, num_items) {
+    .Call("createSink", address, as.integer(num_items), PACKAGE="rzmq")
+}

@@ -32,6 +32,7 @@ extern "C" {
   SEXP connectSocket(SEXP socket_, SEXP address_);
   SEXP sendSocket(SEXP socket_, SEXP data_);
   SEXP receiveSocket(SEXP socket_);
+  SEXP createSink(SEXP address_, SEXP num_items_);
 }
 
 #endif // INTERFACE_HPP

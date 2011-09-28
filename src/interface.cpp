@@ -15,12 +15,12 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>. //
 ///////////////////////////////////////////////////////////////////////////
 
+#include <stdint.h>
 #include <string>
 #include <iostream>
 #include <zmq.hpp>
 #include "interface.h"
-
-//enum socket_type_t {ZMQ_PAIR,ZMQ_PUB,ZMQ_SUB,ZMQ_REQ,ZMQ_REP,ZMQ_DEALER,ZMQ_ROUTER,ZMQ_PULL,ZMQ_PUSH,ZMQ_XPUB,ZMQ_XSUB,NOT_FOUND};
+#include "sink.h"
 
 int string_to_socket_type(const std::string s) {
   if(s == "ZMQ_PAIR") {
@@ -62,6 +62,12 @@ static void socketFinalizer(SEXP socket_) {
   R_ClearExternalPtr(socket_);
 }
 
+static void sinkFinalizer(SEXP sink_) {
+  Sink* sink = reinterpret_cast<Sink*>(R_ExternalPtrAddr(sink_));
+  delete sink;
+  R_ClearExternalPtr(sink_);
+}
+
 SEXP initContext() {
   SEXP context_;
   zmq::context_t* context = new zmq::context_t(1);
@@ -87,6 +93,11 @@ SEXP initSocket(SEXP context_, SEXP socket_type_) {
 
   zmq::context_t* context = reinterpret_cast<zmq::context_t*>(R_ExternalPtrAddr(context_));
   zmq::socket_t* socket = new zmq::socket_t(*context,socket_type);
+
+  // for debugging
+  //uint64_t hwm = 1;
+  //socket->setsockopt(ZMQ_HWM, &hwm, sizeof (hwm));
+
   PROTECT(socket_ = R_MakeExternalPtr(reinterpret_cast<void*>(socket),install("zmq::socket_t"),R_NilValue));
   R_RegisterCFinalizerEx(socket_, socketFinalizer, TRUE);
   UNPROTECT(1);
@@ -164,4 +175,23 @@ SEXP receiveSocket(SEXP socket_) {
   }
 
   return R_NilValue;
+}
+
+SEXP createSink(SEXP address_, SEXP num_items_) {
+  if(TYPEOF(address_) != STRSXP) {
+    std::cerr << "address type must be a string." << std::endl;
+    return R_NilValue;
+  }
+
+  if(TYPEOF(num_items_) != INTSXP) {
+    std::cerr << "num_items type must be an integer." << std::endl;
+    return R_NilValue;
+  }
+
+  SEXP sink_;
+  Sink* sink = new Sink(CHAR(STRING_ELT(address_,0)),INTEGER(num_items_)[0]);
+  PROTECT(sink_ = R_MakeExternalPtr(reinterpret_cast<void*>(sink),install("sink"),R_NilValue));
+  R_RegisterCFinalizerEx(sink_, sinkFinalizer, TRUE);
+  UNPROTECT(1);
+  return sink_;
 }

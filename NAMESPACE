@@ -6,5 +6,6 @@ export(
        bind.socket,
        connect.socket,
        send.socket,
-       receive.socket
+       receive.socket,
+       create.sink
        )
