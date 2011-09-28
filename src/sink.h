@@ -28,14 +28,15 @@
 class Sink {
 private:
   typedef std::vector<char*> container;
-  container results_;
-  std::vector<size_t> msg_sizes_;
   const char* address_;
   const size_t num_items_;
+  size_t msgs_received;
+  container results_;
+  std::vector<size_t> msg_sizes_;
   pthread_t worker_;
 public:
   Sink(const char* address, size_t num_items):
-    address_(address), num_items_(num_items) //, results_(num_items), msg_sizes_(num_items)
+    address_(address), num_items_(num_items), msgs_received(0), results_(num_items), msg_sizes_(num_items)
   {
     pthread_create(&worker_, NULL, &Sink::start_thread, static_cast<void*>(this));
   }
@@ -53,7 +54,6 @@ public:
   }
 
   void sink_routine() {
-    size_t msgs_received(0);
     zmq::context_t context(1);
     zmq::socket_t receiver(context,ZMQ_PULL);
     try {
@@ -69,10 +69,10 @@ public:
       zmq::message_t msg;
       receiver.recv(&msg);
 
-      msg_sizes_.push_back(msg.size());
+      msg_sizes_[msgs_received] = msg.size();
       char* dest = new char[msg.size()];
       // if(dest == NULL) panic;
-      results_.push_back(dest);
+      results_[msgs_received] = dest;
       memcpy(dest,msg.data(),msg.size());
       ++msgs_received;
     }
@@ -80,7 +80,7 @@ public:
 
   SEXP getResults() {
     SEXP ans, x;
-    while(results_.size() < num_items_) {
+    while(msgs_received < num_items_) {
       sleep(1);
     }
     PROTECT(ans = allocVector(VECSXP,results_.size()));
