@@ -1,25 +1,25 @@
 \name{init.context}
 \alias{init.context}
-%- Also NEED an '\alias' for EACH other topic documented here.
+\alias{init.socket}
 \title{
-%%  ~~function to do ... ~~
+initailize zmq context and zmq socket
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+initailize zmq context and zmq socket for to be used for further zmq operations.
 }
 \usage{
 init.context()
+init.socket(context, socket.type)
 }
-%- maybe also 'usage' for other objects documented here.
-\details{
-%%  ~~ If necessary, more details than the description above ~~
-}
+
+\arguments{
+  \item{context}{returns a zmq context object.}
+  \item{socket.type}{ The ZMQ socket type requested
+    e.g. ZMQ_REQ,ZMQ_REP,ZMQ_PULL,ZMQ_PUSH, etc.}
+
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+  \code{init.context} returns a zmq context object.
+  \code{init.socket} returns a zmq socket object.
 }
 \references{
 http://www.zeromq.org
@@ -30,26 +30,15 @@ http://zguide.zeromq.org/page:all
 ZMQ was written by Martin Sustrik <sustrik@250bpm.com> and Martin Lucina <mato@kotelna.sk>.
 rzmq was written by Whit Armstrong.
 }
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{connect.socket},\link{bind.socket},\link{receive.socket},\link{send.socket}}
 }
-\examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-function () 
-{
-    .Call("initContext", PACKAGE = "rzmq")
-  }
-}
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
+\examples{\dontrun{
+
+library(rzmq)
+context = init.context()
+in.socket = init.socket(context,"ZMQ_PULL")
+}}
 \keyword{utilities}

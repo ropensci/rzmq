@@ -1,33 +1,23 @@
 \name{send.socket}
 \alias{send.socket}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+send a message.
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Queue the message referenced by the msg argument to be sent to the socket referenced by the socket argument. 
+
+A successful invocation of zmq_send() does not indicate that the message has been transmitted to the network, only that it has been queued on the socket and ØMQ has assumed responsibility for the message.
 }
 \usage{
 send.socket(socket, data)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
-  \item{socket}{
-%%     ~~Describe \code{socket} here~~
-}
-  \item{data}{
-%%     ~~Describe \code{data} here~~
-}
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
+  \item{socket}{a zmq socket object}
+  \item{data}{the R data/object to be sent}
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+a LOGICAL indicating success or failure of the operation.
 }
 \references{
 http://www.zeromq.org
@@ -38,26 +28,29 @@ http://zguide.zeromq.org/page:all
 ZMQ was written by Martin Sustrik <sustrik@250bpm.com> and Martin Lucina <mato@kotelna.sk>.
 rzmq was written by Whit Armstrong.
 }
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{connect.socket},\link{bind.socket},\link{receive.socket},\link{send.socket}}
 }
-\examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+\examples{\dontrun{
 
-## The function is currently defined as
-function (socket, data) 
-{
-    .Call("sendSocket", socket, serialize(data, NULL), PACKAGE = "rzmq")
-  }
+## remote execution server in rzmq
+library(rzmq)
+context = init.context()
+in.socket = init.socket(context,"ZMQ_PULL")
+bind.socket(in.socket,"tcp://*:5557")
+
+out.socket = init.socket(context,"ZMQ_PUSH")
+bind.socket(out.socket,"tcp://*:5558")
+
+while(1) {
+   msg = receive.socket(in.socket)
+   fun <- msg$fun
+   args <- msg$args
+   print(args)
+   ans <- do.call(fun,args)
+   send.socket(out.socket,ans)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
+}}
+
 \keyword{utilities}

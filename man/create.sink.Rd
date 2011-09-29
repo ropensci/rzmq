@@ -1,33 +1,27 @@
 \name{create.sink}
 \alias{create.sink}
-%- Also NEED an '\alias' for EACH other topic documented here.
+\alias{get.sink.results}
 \title{
-%%  ~~function to do ... ~~
+  create a sink object.
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+  Create a sink object in a separate thread which acts as an async
+  reciever for remotely executed jobs.
+
+  The job results can be later retreived via get.sink.results.
 }
 \usage{
 create.sink(address, num_items)
+get.sink.results(sink)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{address}{
-%%     ~~Describe \code{address} here~~
-}
-  \item{num_items}{
-%%     ~~Describe \code{num_items} here~~
-}
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
+  \item{address}{the transport endpoint for the remote sink server.}
+  \item{num_items}{the number of items to indicate the remote job has completed.}
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+  create.sink returns a sink object
+  get.sink.results returns a list of the remotely executed jobs
 }
 \references{
 http://www.zeromq.org
@@ -38,26 +32,24 @@ http://zguide.zeromq.org/page:all
 ZMQ was written by Martin Sustrik <sustrik@250bpm.com> and Martin Lucina <mato@kotelna.sk>.
 rzmq was written by Whit Armstrong.
 }
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{connect.socket},\link{bind.socket},\link{receive.socket},\link{send.socket}}
 }
-\examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+\examples{\dontrun{
+## an example in the spirit of lapply
+x <- as.list(1:100)
+context = init.context()
+execution.socket = init.socket(context,"ZMQ_PUSH")
+connect.socket(execution.socket,"tcp://my.remote.server:5557")
 
-## The function is currently defined as
-function (address, num_items) 
-{
-    .Call("createSink", address, as.integer(num_items), PACKAGE = "rzmq")
-  }
+## listen for results
+N <- length(x)
+sink <- create.sink("tcp://my.results.server:5558",N)
+for(i in 1:N) {
+remote.exec(execution.socket,FUN,x[[i]])
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
+ans <- get.sink.results(sink)
+lapply(ans,unserialize)
+}}
+
 \keyword{utilities}

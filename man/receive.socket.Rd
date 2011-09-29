@@ -1,30 +1,21 @@
 \name{receive.socket}
 \alias{receive.socket}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+Receive a message from the socket referenced by the socket argument .
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+The zmq_recv() function shall receive a message from the socket
+referenced by the socket argument. If there are no messages available on the specified socket the function shall block until the request can be satisfied.
 }
 \usage{
 receive.socket(socket)
 }
-%- maybe also 'usage' for other objects documented here.
+
 \arguments{
-  \item{socket}{
-%%     ~~Describe \code{socket} here~~
-}
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
+  \item{socket}{a zmq socket object}
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
+  the value sent from the remote server or NULL on failure.
 }
 \references{
 http://www.zeromq.org
@@ -35,27 +26,31 @@ http://zguide.zeromq.org/page:all
 ZMQ was written by Martin Sustrik <sustrik@250bpm.com> and Martin Lucina <mato@kotelna.sk>.
 rzmq was written by Whit Armstrong.
 }
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
-
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+  \code{\link{connect.socket},\link{bind.socket},\link{receive.socket},\link{send.socket}}
 }
-\examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
+\examples{\dontrun{
+library(rzmq)
 
-## The function is currently defined as
-function (socket) 
-{
-    ans <- .Call("receiveSocket", socket, PACKAGE = "rzmq")
-    unserialize(ans)
-  }
+remote.exec <- function(out.socket,in.socket,fun,...) {
+    send.socket(out.socket,data=list(fun=fun,args=list(...)))
+    receive.socket(in.socket)
 }
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
+
+context = init.context()
+out.socket = init.socket(context,"ZMQ_PUSH")
+bind.socket(out.socket,"tcp://*:5557")
+
+in.socket = init.socket(context,"ZMQ_PULL")
+bind.socket(in.socket,"tcp://*:5558")
+
+
+myfun <- function(x) {
+    sum(abs(x))
+}
+
+remote.exec(out.socket,in.socket,myfun,rnorm(1e3))
+
+}}
+
 \keyword{utilities}

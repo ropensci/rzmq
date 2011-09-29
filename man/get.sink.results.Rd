@@ -1,6 +1,5 @@
 \name{get.sink.results}
 \alias{get.sink.results}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 %%  ~~function to do ... ~~
 }
