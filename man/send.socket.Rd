@@ -1,12 +1,12 @@
 \name{send.socket}
 \alias{send.socket}
 \title{
-send a message.
+  send a message.
 }
 \description{
-Queue the message referenced by the msg argument to be sent to the socket referenced by the socket argument. 
+  Queue the message referenced by the msg argument to be sent to the socket referenced by the socket argument. 
 
-A successful invocation of zmq_send() does not indicate that the message has been transmitted to the network, only that it has been queued on the socket and ØMQ has assumed responsibility for the message.
+  A successful invocation of send.socket does not indicate that the message has been transmitted to the network, only that it has been queued on the socket and ZMQ has assumed responsibility for the message.
 }
 \usage{
 send.socket(socket, data)
@@ -14,19 +14,19 @@ send.socket(socket, data)
 
 \arguments{
   \item{socket}{a zmq socket object}
-  \item{data}{the R data/object to be sent}
+  \item{data}{the R object to be sent}
 }
 \value{
-a LOGICAL indicating success or failure of the operation.
+  a boolean indicating success or failure of the operation.
 }
 \references{
-http://www.zeromq.org
-http://api.zeromq.org
-http://zguide.zeromq.org/page:all
+  http://www.zeromq.org
+  http://api.zeromq.org
+  http://zguide.zeromq.org/page:all
 }
 \author{
-ZMQ was written by Martin Sustrik <sustrik@250bpm.com> and Martin Lucina <mato@kotelna.sk>.
-rzmq was written by Whit Armstrong.
+  ZMQ was written by Martin Sustrik <sustrik@250bpm.com> and Martin Lucina <mato@kotelna.sk>.
+  rzmq was written by Whit Armstrong.
 }
 
 \seealso{
@@ -52,5 +52,4 @@ while(1) {
    send.socket(out.socket,ans)
 }
 }}
-
 \keyword{utilities}

@@ -14,10 +14,11 @@
 create.sink(address, num_items)
 get.sink.results(sink)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{address}{the transport endpoint for the remote sink server.}
-  \item{num_items}{the number of items to indicate the remote job has completed.}
+  \item{num_items}{the number of items to indicate the remote job has
+    completed.}
+  \item{sink}{the sink object.}
 }
 \value{
   create.sink returns a sink object
