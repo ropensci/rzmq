@@ -149,13 +149,18 @@ SEXP sendSocket(SEXP socket_, SEXP data_) {
   SEXP ans; PROTECT(ans = allocVector(LGLSXP,1));
   if(TYPEOF(data_) != RAWSXP) {
     std::cerr << "data type must be raw (RAWSXP)." << std::endl;
+    UNPROTECT(1);
     return R_NilValue;
   }
 
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(R_ExternalPtrAddr(socket_));
   zmq::message_t msg (length(data_));
   memcpy(msg.data(), RAW(data_), length(data_));
-  bool status = socket->send(msg);
+  try {
+    bool status = socket->send(msg);
+  } catch(std::exception& e) {
+    std::cerr << e.what() << std::endl;
+  }
   LOGICAL(ans)[0] = static_cast<int>(status);
   UNPROTECT(1);
   return ans;
@@ -165,8 +170,11 @@ SEXP receiveSocket(SEXP socket_) {
   SEXP ans;
   zmq::message_t msg;
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(R_ExternalPtrAddr(socket_));
-  bool status = socket->recv(&msg);
-
+  try {
+    bool status = socket->recv(&msg);
+  } catch(std::exception& e) {
+    std::cerr << e.what() << std::endl;
+  }
   if(status) {
     PROTECT(ans = allocVector(RAWSXP,msg.size()));
     memcpy(RAW(ans),msg.data(),msg.size());
