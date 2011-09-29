@@ -1,2 +1,1 @@
-PKG_CPPFLAGS = -Wall -g
 PKG_LIBS = -lzmq
