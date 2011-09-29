@@ -30,10 +30,13 @@ bind.socket(socket, address)
 %% ...
 }
 \references{
-%% ~put references to the literature/web site here ~
+http://www.zeromq.org
+http://api.zeromq.org
+http://zguide.zeromq.org/page:all
 }
 \author{
-%%  ~~who you are~~
+ZMQ was written by Martin Sustrik <sustrik@250bpm.com> and Martin Lucina <mato@kotelna.sk>.
+rzmq was written by Whit Armstrong.
 }
 \note{
 %%  ~~further notes~~
