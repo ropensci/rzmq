@@ -5,3 +5,5 @@ Maintainer: Whit Armstrong <armstrong.whit@gmail.com>
 Author: Whit Armstrong <armstrong.whit@gmail.com>
 Description: R binding for zmq
 License: GPL-3
+URL: http://github.com/armstrtw/rzmq
+BugReports: http://github.com/armstrtw/rzmq/issues
