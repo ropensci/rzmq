@@ -20,10 +20,9 @@
 #define SINK_HPP
 
 #include <vector>
-#include <iostream>
 #include <pthread.h>
 #include <zmq.hpp>
-//#include <Rinternals.h>
+#include <Rinternals.h>
 
 class Sink {
 private:
@@ -59,7 +58,7 @@ public:
     try {
       receiver.connect(address_);
     } catch(std::exception& e) {
-      std::cerr << e.what() << std::endl;
+      Rprintf("%s\n",e.what());
       // we don't want to execute the thread
       // if it can't connect
       return;
