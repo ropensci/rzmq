@@ -79,8 +79,8 @@ public:
 
   SEXP getResults() {
     SEXP ans, x;
-    while(msgs_received < num_items_) {
-      sleep(1);
+    if(pthread_join(worker_, NULL) != 0) {
+      return R_NilValue;
     }
     PROTECT(ans = allocVector(VECSXP,results_.size()));
     for(size_t i = 0; i < results_.size(); i++) {

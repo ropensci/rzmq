@@ -47,3 +47,43 @@ create.sink <- function(address, num_items) {
 get.sink.results <- function(sink) {
     .Call("getSinkResults", sink, PACKAGE="rzmq")
 }
+
+zmq.lapply <- function(X,FUN,execution.server,sink.server) {
+    remote.exec <- function(socket,index,fun,...) {
+        send.socket(socket,data=list(index=index,fun=fun,args=list(...)))
+    }
+
+    FUN <- match.fun(FUN)
+    if (!is.vector(X) || is.object(X))
+        X <- as.list(X)
+
+    context = init.context()
+    execution.socket = init.socket(context,"ZMQ_PUSH")
+    connect.socket(execution.socket,execution.server)
+
+    ## listen for results on the sink server
+    N <- length(X)
+    sink <- create.sink(sink.server,N)
+
+    ## submit jobs
+    for(i in 1:N) {
+        remote.exec(socket=execution.socket,index=i,fun=FUN,X[[i]])
+    }
+
+    ## pick up restuls
+    ans.raw <- get.sink.results(sink)
+    ans <- lapply(ans.raw,unserialize)
+
+    ## reorder anser based on returned index numbers
+    ans.ordered <- vector("list",N)
+
+    ## apply names if they exist
+    if(!is.null(names(X))) {
+        names(ans.ordered) <- names(X)
+    }
+
+    for(i in 1:N) {
+        ans.ordered[[ ans[[i]]$index ]] <- ans[[i]]$result
+    }
+    ans.ordered
+}
