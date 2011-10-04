@@ -8,5 +8,6 @@ export(
        send.socket,
        receive.socket,
        create.sink,
-       get.sink.results
+       get.sink.results,
+       zmq.lapply
        )
