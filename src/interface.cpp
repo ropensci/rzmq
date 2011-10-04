@@ -80,13 +80,13 @@ SEXP initSocket(SEXP context_, SEXP socket_type_) {
   SEXP socket_;
 
   if(TYPEOF(socket_type_) != STRSXP) {
-    Rprintf("socket type must be a string.\n");
+    REprintf("socket type must be a string.\n");
     return R_NilValue;
   }
 
   int socket_type = string_to_socket_type(CHAR(STRING_ELT(socket_type_,0)));
   if(socket_type < 0) {
-    Rprintf("socket type not found.\n");
+    REprintf("socket type not found.\n");
     return R_NilValue;
   }
 
@@ -108,7 +108,7 @@ SEXP bindSocket(SEXP socket_, SEXP address_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(R_ExternalPtrAddr(socket_));
 
   if(TYPEOF(address_) != STRSXP) {
-    Rprintf("address type must be a string.\n");
+    REprintf("address type must be a string.\n");
     UNPROTECT(1);
     return R_NilValue;
   }
@@ -116,7 +116,7 @@ SEXP bindSocket(SEXP socket_, SEXP address_) {
   try {
     socket->bind(CHAR(STRING_ELT(address_,0)));
   } catch(std::exception& e) {
-    Rprintf("%s\n",e.what());
+    REprintf("%s\n",e.what());
     LOGICAL(ans)[0] = 0;
   }
 
@@ -129,14 +129,14 @@ SEXP connectSocket(SEXP socket_, SEXP address_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(R_ExternalPtrAddr(socket_));
 
   if(TYPEOF(address_) != STRSXP) {
-    Rprintf("address type must be a string.\n");
+    REprintf("address type must be a string.\n");
     UNPROTECT(1);
     return R_NilValue;
   }
   try {
     socket->connect(CHAR(STRING_ELT(address_,0)));    
   } catch(std::exception& e) {
-    Rprintf("%s\n",e.what());
+    REprintf("%s\n",e.what());
     LOGICAL(ans)[0] = 0;
   }
 
@@ -148,7 +148,7 @@ SEXP sendSocket(SEXP socket_, SEXP data_) {
   SEXP ans; PROTECT(ans = allocVector(LGLSXP,1));
   bool status;
   if(TYPEOF(data_) != RAWSXP) {
-    Rprintf("data type must be raw (RAWSXP).\n");
+    REprintf("data type must be raw (RAWSXP).\n");
     UNPROTECT(1);
     return R_NilValue;
   }
@@ -159,7 +159,7 @@ SEXP sendSocket(SEXP socket_, SEXP data_) {
   try {
     status = socket->send(msg);
   } catch(std::exception& e) {
-    Rprintf("%s\n",e.what());
+    REprintf("%s\n",e.what());
   }
   LOGICAL(ans)[0] = static_cast<int>(status);
   UNPROTECT(1);
@@ -174,7 +174,7 @@ SEXP receiveSocket(SEXP socket_) {
   try {
     status = socket->recv(&msg);
   } catch(std::exception& e) {
-    Rprintf("%s\n",e.what());
+    REprintf("%s\n",e.what());
   }
   if(status) {
     PROTECT(ans = allocVector(RAWSXP,msg.size()));
@@ -188,12 +188,12 @@ SEXP receiveSocket(SEXP socket_) {
 
 SEXP createSink(SEXP address_, SEXP num_items_) {
   if(TYPEOF(address_) != STRSXP) {
-    Rprintf("address type must be a string.\n");
+    REprintf("address type must be a string.\n");
     return R_NilValue;
   }
 
   if(TYPEOF(num_items_) != INTSXP) {
-    Rprintf("num_items type must be an integer.\n");
+    REprintf("num_items type must be an integer.\n");
     return R_NilValue;
   }
 

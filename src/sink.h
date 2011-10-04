@@ -58,7 +58,7 @@ public:
     try {
       receiver.connect(address_);
     } catch(std::exception& e) {
-      Rprintf("%s\n",e.what());
+      REprintf("%s\n",e.what());
       // we don't want to execute the thread
       // if it can't connect
       return;
@@ -79,7 +79,9 @@ public:
 
   SEXP getResults() {
     SEXP ans, x;
-    if(pthread_join(worker_, NULL) != 0) {
+    int worker_exit = pthread_join(worker_, NULL);
+    if(worker_exit != 0) {
+      REprintf("Sink worker had non-zero exit: %d\n",worker_exit);
       return R_NilValue;
     }
     PROTECT(ans = allocVector(VECSXP,results_.size()));
