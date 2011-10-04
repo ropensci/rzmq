@@ -24,6 +24,7 @@
 
 static void contextFinalizer(SEXP context_);
 static void socketFinalizer(SEXP socket_);
+static void sinkFinalizer(SEXP sink_);
 
 extern "C" {
   SEXP initContext();
