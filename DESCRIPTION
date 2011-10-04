@@ -5,6 +5,6 @@ Maintainer: Whit Armstrong <armstrong.whit@gmail.com>
 Author: Whit Armstrong <armstrong.whit@gmail.com>
 Description: R binding for zmq
 License: GPL-3
-SystemRequirements: libzmq
+SystemRequirements: libzmq, lippthread
 URL: http://github.com/armstrtw/rzmq
 BugReports: http://github.com/armstrtw/rzmq/issues
