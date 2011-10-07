@@ -48,6 +48,14 @@ receive.string <- function(socket) {
     .Call("receiveString", socket, PACKAGE="rzmq")
 }
 
+receive.int <- function(socket) {
+    .Call("receiveInt", socket, PACKAGE="rzmq")
+}
+
+receive.double <- function(socket) {
+    .Call("receiveDouble", socket, PACKAGE="rzmq")
+}
+
 create.sink <- function(address, num_items) {
     .Call("createSink", address, as.integer(num_items), PACKAGE="rzmq")
 }

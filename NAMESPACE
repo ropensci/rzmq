@@ -9,6 +9,8 @@ export(
        send.null.msg,
        receive.socket,
        receive.string,
+       receive.int,
+       receive.double,
        create.sink,
        get.sink.results,
        zmq.lapply

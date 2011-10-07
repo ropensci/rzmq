@@ -228,6 +228,52 @@ SEXP receiveString(SEXP socket_) {
   return R_NilValue;
 }
 
+SEXP receiveInt(SEXP socket_) {
+  SEXP ans;
+  bool status;
+  zmq::message_t msg;
+  zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(R_ExternalPtrAddr(socket_));
+  try {
+    status = socket->recv(&msg);
+  } catch(std::exception& e) {
+    REprintf("%s\n",e.what());
+  }
+  if(status) {
+    if(msg.size() != sizeof(int)) {
+      REprintf("bad integer size on remote machine.\n");
+      return R_NilValue;
+    }
+    PROTECT(ans = allocVector(INTSXP,1));
+    memcpy(INTEGER(ans),msg.data(),msg.size());
+    UNPROTECT(1);
+    return ans;
+  }
+  return R_NilValue;
+}
+
+SEXP receiveDouble(SEXP socket_) {
+  SEXP ans;
+  bool status;
+  zmq::message_t msg;
+  zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(R_ExternalPtrAddr(socket_));
+  try {
+    status = socket->recv(&msg);
+  } catch(std::exception& e) {
+    REprintf("%s\n",e.what());
+  }
+  if(status) {
+    if(msg.size() != sizeof(double)) {
+      REprintf("bad double size on remote machine.\n");
+      return R_NilValue;
+    }
+    PROTECT(ans = allocVector(REALSXP,1));
+    memcpy(REAL(ans),msg.data(),msg.size());
+    UNPROTECT(1);
+    return ans;
+  }
+  return R_NilValue;
+}
+
 SEXP createSink(SEXP address_, SEXP num_items_) {
   if(TYPEOF(address_) != STRSXP) {
     REprintf("address type must be a string.\n");

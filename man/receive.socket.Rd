@@ -1,6 +1,8 @@
 \name{receive.socket}
 \alias{receive.socket}
 \alias{receive.string}
+\alias{receive.int}
+\alias{receive.double}
 \title{
 Receive a message from the socket referenced by the socket argument .
 }
@@ -11,6 +13,8 @@ referenced by the socket argument. If there are no messages available on the spe
 \usage{
 receive.socket(socket)
 receive.string(socket)
+receive.int(socket)
+receive.double(socket)
 }
 
 \arguments{

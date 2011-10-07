@@ -35,6 +35,8 @@ extern "C" {
   SEXP sendNullMsg(SEXP socket_);
   SEXP receiveSocket(SEXP socket_);
   SEXP receiveString(SEXP socket_);
+  SEXP receiveInt(SEXP socket_);
+  SEXP receiveDouble(SEXP socket_);
   SEXP createSink(SEXP address_, SEXP num_items_);
   SEXP getSinkResults(SEXP sink_);
 }
