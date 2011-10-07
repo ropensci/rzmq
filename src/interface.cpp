@@ -166,6 +166,22 @@ SEXP sendSocket(SEXP socket_, SEXP data_) {
   return ans;
 }
 
+SEXP sendNullMsg(SEXP socket_) {
+  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1));
+  bool status;
+
+  zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(R_ExternalPtrAddr(socket_));
+  zmq::message_t msg(0);
+  try {
+    status = socket->send(msg);
+  } catch(std::exception& e) {
+    REprintf("%s\n",e.what());
+  }
+  LOGICAL(ans)[0] = static_cast<int>(status);
+  UNPROTECT(1);
+  return ans;
+}
+
 SEXP receiveSocket(SEXP socket_) {
   SEXP ans;
   bool status;
@@ -183,6 +199,32 @@ SEXP receiveSocket(SEXP socket_) {
     return ans;
   }
 
+  return R_NilValue;
+}
+
+SEXP receiveString(SEXP socket_) {
+  SEXP ans;
+  bool status;
+  zmq::message_t msg;
+  zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(R_ExternalPtrAddr(socket_));
+  try {
+    status = socket->recv(&msg);
+  } catch(std::exception& e) {
+    REprintf("%s\n",e.what());
+  }
+  if(status) {
+    PROTECT(ans = allocVector(STRSXP,1));
+    char* string_msg = new char[msg.size() + 1];
+    if(string_msg == NULL) {
+      UNPROTECT(1);
+      return R_NilValue;
+    }
+    memcpy(string_msg,msg.data(),msg.size());
+    string_msg[msg.size()] = 0;
+    SET_STRING_ELT(ans, 0, mkChar(string_msg));
+    UNPROTECT(1);
+    return ans;
+  }
   return R_NilValue;
 }
 

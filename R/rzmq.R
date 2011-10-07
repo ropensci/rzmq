@@ -35,9 +35,17 @@ send.socket <- function(socket, data) {
     .Call("sendSocket", socket, serialize(data,NULL), PACKAGE="rzmq")
 }
 
+send.null.msg <- function(socket) {
+    .Call("sendNullMsg", socket, PACKAGE="rzmq")
+}
+
 receive.socket <- function(socket) {
     ans <- .Call("receiveSocket", socket, PACKAGE="rzmq")
     unserialize(ans)
+}
+
+receive.string <- function(socket) {
+    .Call("receiveString", socket, PACKAGE="rzmq")
 }
 
 create.sink <- function(address, num_items) {

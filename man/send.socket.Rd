@@ -1,5 +1,6 @@
 \name{send.socket}
 \alias{send.socket}
+\alias{send.null.msg}
 \title{
   send a message.
 }
@@ -10,6 +11,7 @@
 }
 \usage{
 send.socket(socket, data)
+send.null.msg(socket)
 }
 
 \arguments{

@@ -6,7 +6,9 @@ export(
        bind.socket,
        connect.socket,
        send.socket,
+       send.null.msg,
        receive.socket,
+       receive.string,
        create.sink,
        get.sink.results,
        zmq.lapply

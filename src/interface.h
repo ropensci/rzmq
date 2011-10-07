@@ -32,7 +32,9 @@ extern "C" {
   SEXP bindSocket(SEXP socket_, SEXP address_);
   SEXP connectSocket(SEXP socket_, SEXP address_);
   SEXP sendSocket(SEXP socket_, SEXP data_);
+  SEXP sendNullMsg(SEXP socket_);
   SEXP receiveSocket(SEXP socket_);
+  SEXP receiveString(SEXP socket_);
   SEXP createSink(SEXP address_, SEXP num_items_);
   SEXP getSinkResults(SEXP sink_);
 }
