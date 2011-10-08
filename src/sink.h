@@ -27,15 +27,15 @@
 class Sink {
 private:
   typedef std::vector<char*> container;
-  const char* address_;
+  SEXP sink_servers_;
   const size_t num_items_;
   size_t msgs_received;
   container results_;
   std::vector<size_t> msg_sizes_;
   pthread_t worker_;
 public:
-  Sink(const char* address, size_t num_items):
-    address_(address), num_items_(num_items), msgs_received(0), results_(num_items), msg_sizes_(num_items)
+  Sink(SEXP sink_servers, size_t num_items):
+    sink_servers_(sink_servers), num_items_(num_items), msgs_received(0), results_(num_items), msg_sizes_(num_items)
   {
     pthread_create(&worker_, NULL, &Sink::start_thread, static_cast<void*>(this));
   }
@@ -56,7 +56,10 @@ public:
     zmq::context_t context(1);
     zmq::socket_t receiver(context,ZMQ_PULL);
     try {
-      receiver.connect(address_);
+      // connect to each sink server
+      for(int i = 0; i < length(sink_servers_); i++) {
+        receiver.connect(CHAR(STRING_ELT(sink_servers_,i)));
+      }
     } catch(std::exception& e) {
       REprintf("%s\n",e.what());
       // we don't want to execute the thread

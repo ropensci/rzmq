@@ -274,8 +274,8 @@ SEXP receiveDouble(SEXP socket_) {
   return R_NilValue;
 }
 
-SEXP createSink(SEXP address_, SEXP num_items_) {
-  if(TYPEOF(address_) != STRSXP) {
+SEXP createSink(SEXP sink_servers_, SEXP num_items_) {
+  if(TYPEOF(sink_servers_) != STRSXP) {
     REprintf("address type must be a string.\n");
     return R_NilValue;
   }
@@ -285,9 +285,8 @@ SEXP createSink(SEXP address_, SEXP num_items_) {
     return R_NilValue;
   }
 
-  SEXP sink_;
-  Sink* sink = new Sink(CHAR(STRING_ELT(address_,0)),INTEGER(num_items_)[0]);
-  PROTECT(sink_ = R_MakeExternalPtr(reinterpret_cast<void*>(sink),install("sink"),R_NilValue));
+  Sink* sink = new Sink(sink_servers_,INTEGER(num_items_)[0]);
+  SEXP sink_; PROTECT(sink_ = R_MakeExternalPtr(reinterpret_cast<void*>(sink),install("sink"),R_NilValue));
   R_RegisterCFinalizerEx(sink_, sinkFinalizer, TRUE);
   UNPROTECT(1);
   return sink_;
