@@ -64,7 +64,7 @@ get.sink.results <- function(sink) {
     .Call("getSinkResults", sink, PACKAGE="rzmq")
 }
 
-zmq.lapply <- function(X,FUN,execution.server,sink.server) {
+zmq.cluster.lapply <- function(cluster,X,FUN,...,push.port=6000,pull.port=6001,control.port=6003) {
     remote.exec <- function(socket,index,fun,...) {
         send.socket(socket,data=list(index=index,fun=fun,args=list(...)))
     }
@@ -75,15 +75,34 @@ zmq.lapply <- function(X,FUN,execution.server,sink.server) {
 
     context = init.context()
     execution.socket = init.socket(context,"ZMQ_PUSH")
-    connect.socket(execution.socket,execution.server)
+
+    ## connect push socket to all remote servers
+    control.points <- paste("tcp://",cluster,":",control.port,sep="")
+    push.points <- paste("tcp://",cluster,":",push.port,sep="")
+    pull.points <- paste("tcp://",cluster,":",pull.port,sep="")
+
+    ## ensure ndoes are available for execution
+    ## to avoid msg hogging / slow joiner issues
+    for(node in control.points) {
+        cat("checking",node,"status: ")
+        control.socket = init.socket(context,"ZMQ_REQ")
+        connect.socket(control.socket,node)
+        send.null.msg(control.socket)
+        status <- receive.string(control.socket)
+        cat(status,"\n")
+    }
+
+    for(node in push.points) {
+        connect.socket(execution.socket,node)
+    }
 
     ## listen for results on the sink server
     N <- length(X)
-    sink <- create.sink(sink.server,N)
+    sink <- create.sink(pull.points,N)
 
     ## submit jobs
     for(i in 1:N) {
-        remote.exec(socket=execution.socket,index=i,fun=FUN,X[[i]])
+        remote.exec(socket=execution.socket,index=i,fun=FUN,X[[i]],...)
     }
 
     ## pick up restuls
@@ -101,5 +120,8 @@ zmq.lapply <- function(X,FUN,execution.server,sink.server) {
     for(i in 1:N) {
         ans.ordered[[ ans[[i]]$index ]] <- ans[[i]]$result
     }
+
+    execution.report <- as.matrix(table(unlist(lapply(ans,"[[","node"))))
+    attr(ans.ordered,"execution.report") <- execution.report
     ans.ordered
 }

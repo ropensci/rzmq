@@ -1,5 +1,5 @@
 \name{zmq.lapply}
-\alias{zmq.lapply}
+\alias{zmq.cluster.lapply}
 \title{
   apply a function to a list.
 }
@@ -11,15 +11,18 @@
   The execution of the function is performed in parallel over zmq sockets.
 }
 \usage{
-zmq.lapply(X, FUN, execution.server, sink.server)
+zmq.cluster.lapply(cluster,X,FUN,...,push.port=6000,pull.port=6001,control.port=6003)
+
 }
 \arguments{
+  \item(cluster){a vector of computer names to use for the parallel lapply}
   \item{X}{a list or vector.}
   \item{FUN}{the function to be applied to each element of \code{X}}
-  \item{execution.server}{the address and port of the remote execution
-    server/broker.}
-  \item{sink.server}{the address and port of the remote job output
-    server/broker.}
+  \item{push.port}{the port to use to send jobs.}
+  \item{pull.port}{the port to use to pick up results.}
+  \item{control.port}{the port to use to check whether the cluster
+    memeber is ready to receive jobs.}
+  \item{\dots}{additional arguments to lapply.}
 }
 \details{
   Successful "parallelization" of lapply requires a broker device to run
@@ -58,12 +61,36 @@ library(rzmq)
 #!/usr/bin/env Rscript
 
 library(rzmq)
+library(getopt)
+
+worker.id <- paste(Sys.info()["nodename"],Sys.getpid(),sep=":")
+
+spec <- rbind(c('control','c', 1, "character"),
+              c('in','i', 1, "character"),
+              c('out','o', 1, "character"),
+              c('log-file','l', 1, "character"))
+
+opts <- getopt(spec)
+control.endpoint <- opts[["control"]]
+in.endpoint <- opts[["in"]]
+out.endpoint <- opts[["out"]]
+log.file <- opts[["log-file"]]
+
+sink(log.file)
+print(opts)
+
 context = init.context()
+
 in.socket = init.socket(context,"ZMQ_PULL")
-bind.socket(in.socket,"tcp://*:5557")
+connect.socket(in.socket,in.endpoint)
 
 out.socket = init.socket(context,"ZMQ_PUSH")
-bind.socket(out.socket,"tcp://*:5558")
+connect.socket(out.socket,out.endpoint)
+
+## send control message to indicate worker is up
+control.socket = init.socket(context,"ZMQ_PUSH")
+connect.socket(control.socket,control.endpoint)
+send.null.msg(control.socket)
 
 while(1) {
     msg = receive.socket(in.socket);
@@ -71,17 +98,21 @@ while(1) {
     fun <- msg$fun
     args <- msg$args
     print(args)
-    result <- do.call(fun,args)
-    send.socket(out.socket,list(index=index,result=result));
+    result <- try(do.call(fun,args),silent=TRUE)
+    send.socket(out.socket,list(index=index,result=result,node=worker.id));
 }
 
 ## run locally
 ## estimatePi example courtesy of JD Long / Jeffrey Breen
+
+library(AWS.tools)
 library(rzmq)
+
+cl <- startCluster(ami="ami-4bc90522",key="kls-ec2",instance.count=5,instance.type="c1.xlarge")
 
 estimatePi <- function(seed) {
     set.seed(seed)
-    numDraws <- 1e5
+    numDraws <- 1e6
 
     r <- .5
     x <- runif(numDraws, min=-r, max=r)
@@ -91,11 +122,16 @@ estimatePi <- function(seed) {
     sum(inCircle) / length(inCircle) * 4
 }
 
-print(system.time(ans <- zmq.lapply(as.list(1:1e2),
-                                    estimatePi,
-                                    execution.server="tcp://ec2-184-73-102-95.compute-1.amazonaws.com:5557",
-                                    sink.server="tcp://ec2-184-73-102-95.compute-1.amazonaws.com:5558")))
+run.time <- system.time(ans <- zmq.cluster.lapply(cluster=cl$instances[,"PublicDNS"],as.list(1:1000),estimatePi))
 
 print(mean(unlist(ans)))
+print(run.time)
+print(attr(ans,"execution.report"))
+
+res <- terminateCluster(cl)
+
+pi.est <- mean(unlist(ans))
+print(pi.est)
+
 }}
 \keyword{utilities}

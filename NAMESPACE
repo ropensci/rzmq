@@ -13,5 +13,5 @@ export(
        receive.double,
        create.sink,
        get.sink.results,
-       zmq.lapply
+       zmq.cluster.lapply
        )
