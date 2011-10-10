@@ -1,6 +1,6 @@
 Package: rzmq
 Title: R binding for zmq (http://www.zeromq.org/)
-Version: 0.5.8
+Version: 0.5.9
 Maintainer: Whit Armstrong <armstrong.whit@gmail.com>
 Author: Whit Armstrong <armstrong.whit@gmail.com>
 Description: R binding for zmq
