@@ -70,10 +70,9 @@ public:
     while(msgs_received < num_items_) {
       zmq::message_t msg;
       receiver.recv(&msg);
-
       msg_sizes_[msgs_received] = msg.size();
       char* dest = new char[msg.size()];
-      // if(dest == NULL) panic;
+      if(dest == NULL) break;
       results_[msgs_received] = dest;
       memcpy(dest,msg.data(),msg.size());
       ++msgs_received;
