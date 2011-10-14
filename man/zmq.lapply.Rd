@@ -11,15 +11,14 @@
   The execution of the function is performed in parallel over zmq sockets.
 }
 \usage{
-zmq.cluster.lapply(cluster,X,FUN,...,push.port=6000,pull.port=6001,control.port=6003)
+zmq.cluster.lapply(cluster,X,FUN,...,deathstar.port=6000,control.port=6001)
 
 }
 \arguments{
   \item{cluster}{a vector of computer names to use for the parallel lapply}
   \item{X}{a list or vector.}
   \item{FUN}{the function to be applied to each element of \code{X}}
-  \item{push.port}{the port to use to send jobs.}
-  \item{pull.port}{the port to use to pick up results.}
+  \item{deathstar.port}{the port to use to send jobs/receive results.}
   \item{control.port}{the port to use to check whether the cluster
     memeber is ready to receive jobs.}
   \item{\dots}{additional arguments to lapply.}
