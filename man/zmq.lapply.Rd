@@ -15,7 +15,7 @@ zmq.cluster.lapply(cluster,X,FUN,...,push.port=6000,pull.port=6001,control.port=
 
 }
 \arguments{
-  \item(cluster){a vector of computer names to use for the parallel lapply}
+  \item{cluster}{a vector of computer names to use for the parallel lapply}
   \item{X}{a list or vector.}
   \item{FUN}{the function to be applied to each element of \code{X}}
   \item{push.port}{the port to use to send jobs.}
