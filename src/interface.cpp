@@ -19,7 +19,6 @@
 #include <string>
 #include <zmq.hpp>
 #include "interface.h"
-#include "sink.h"
 
 int string_to_socket_type(const std::string s) {
   if(s == "ZMQ_PAIR") {
@@ -59,12 +58,6 @@ static void socketFinalizer(SEXP socket_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(R_ExternalPtrAddr(socket_));
   delete socket;
   R_ClearExternalPtr(socket_);
-}
-
-static void sinkFinalizer(SEXP sink_) {
-  Sink* sink = reinterpret_cast<Sink*>(R_ExternalPtrAddr(sink_));
-  delete sink;
-  R_ClearExternalPtr(sink_);
 }
 
 SEXP initContext() {
@@ -272,27 +265,4 @@ SEXP receiveDouble(SEXP socket_) {
     return ans;
   }
   return R_NilValue;
-}
-
-SEXP createSink(SEXP sink_servers_, SEXP num_items_) {
-  if(TYPEOF(sink_servers_) != STRSXP) {
-    REprintf("address type must be a string.\n");
-    return R_NilValue;
-  }
-
-  if(TYPEOF(num_items_) != INTSXP) {
-    REprintf("num_items type must be an integer.\n");
-    return R_NilValue;
-  }
-
-  Sink* sink = new Sink(sink_servers_,INTEGER(num_items_)[0]);
-  SEXP sink_; PROTECT(sink_ = R_MakeExternalPtr(reinterpret_cast<void*>(sink),install("sink"),R_NilValue));
-  R_RegisterCFinalizerEx(sink_, sinkFinalizer, TRUE);
-  UNPROTECT(1);
-  return sink_;
-}
-
-SEXP getSinkResults(SEXP sink_) {
-  Sink* sink = reinterpret_cast<Sink*>(R_ExternalPtrAddr(sink_));
-  return sink->getResults();
 }
