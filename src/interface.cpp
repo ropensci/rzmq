@@ -137,7 +137,7 @@ SEXP connectSocket(SEXP socket_, SEXP address_) {
   return ans;
 }
 
-SEXP sendSocket(SEXP socket_, SEXP data_) {
+SEXP sendSocket(SEXP socket_, SEXP data_, SEXP send_more_) {
   SEXP ans; PROTECT(ans = allocVector(LGLSXP,1));
   bool status;
   if(TYPEOF(data_) != RAWSXP) {
@@ -146,11 +146,23 @@ SEXP sendSocket(SEXP socket_, SEXP data_) {
     return R_NilValue;
   }
 
+  if(TYPEOF(send_more_) != LGLSXP) {
+    REprintf("send.more type must be logical (LGLSXP).\n");
+    UNPROTECT(1);
+    return R_NilValue;
+  }
+
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(R_ExternalPtrAddr(socket_));
   zmq::message_t msg (length(data_));
   memcpy(msg.data(), RAW(data_), length(data_));
+
+  bool send_more = LOGICAL(send_more_)[0];
   try {
-    status = socket->send(msg);
+    if(send_more) {
+      status = socket->send(msg,ZMQ_SNDMORE);
+    } else {
+      status = socket->send(msg);
+    }
   } catch(std::exception& e) {
     REprintf("%s\n",e.what());
   }
@@ -159,18 +171,46 @@ SEXP sendSocket(SEXP socket_, SEXP data_) {
   return ans;
 }
 
-SEXP sendNullMsg(SEXP socket_) {
+SEXP sendNullMsg(SEXP socket_, SEXP send_more_) {
   SEXP ans; PROTECT(ans = allocVector(LGLSXP,1));
   bool status;
 
+  if(TYPEOF(send_more_) != LGLSXP) {
+    REprintf("send.more type must be logical (LGLSXP).\n");
+    UNPROTECT(1);
+    return R_NilValue;
+  }
+
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(R_ExternalPtrAddr(socket_));
   zmq::message_t msg(0);
+
+  bool send_more = LOGICAL(send_more_)[0];
   try {
-    status = socket->send(msg);
+    if(send_more) {
+      status = socket->send(msg,ZMQ_SNDMORE);
+    } else {
+      status = socket->send(msg);
+    }
   } catch(std::exception& e) {
     REprintf("%s\n",e.what());
   }
   LOGICAL(ans)[0] = static_cast<int>(status);
+  UNPROTECT(1);
+  return ans;
+}
+
+SEXP receiveNullMsg(SEXP socket_) {
+  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1));
+  bool status;
+
+  zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(R_ExternalPtrAddr(socket_));
+  zmq::message_t msg;
+  try {
+    status = socket->recv(&msg);
+  } catch(std::exception& e) {
+    REprintf("%s\n",e.what());
+  }
+  LOGICAL(ans)[0] = static_cast<int>(status) && (msg.size() == 0);
   UNPROTECT(1);
   return ans;
 }

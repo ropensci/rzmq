@@ -10,13 +10,14 @@
   A successful invocation of send.socket does not indicate that the message has been transmitted to the network, only that it has been queued on the socket and ZMQ has assumed responsibility for the message.
 }
 \usage{
-send.socket(socket, data)
-send.null.msg(socket)
+send.socket(socket, data, send.more=FALSE)
+send.null.msg(socket, send.more=FALSE)
 }
 
 \arguments{
   \item{socket}{a zmq socket object}
   \item{data}{the R object to be sent}
+  \item{send.more}{whether this message has more frames to be sent}
 }
 \value{
   a boolean indicating success or failure of the operation.

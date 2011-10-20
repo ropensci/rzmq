@@ -30,8 +30,9 @@ extern "C" {
   SEXP initSocket(SEXP context_, SEXP socket_type_);
   SEXP bindSocket(SEXP socket_, SEXP address_);
   SEXP connectSocket(SEXP socket_, SEXP address_);
-  SEXP sendSocket(SEXP socket_, SEXP data_);
-  SEXP sendNullMsg(SEXP socket_);
+  SEXP sendSocket(SEXP socket_, SEXP data_, SEXP send_more_);
+  SEXP sendNullMsg(SEXP socket_, SEXP send_more_);
+  SEXP receiveNullMsg(SEXP socket_);
   SEXP receiveSocket(SEXP socket_);
   SEXP receiveString(SEXP socket_);
   SEXP receiveInt(SEXP socket_);

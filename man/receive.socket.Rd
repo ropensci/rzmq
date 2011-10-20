@@ -1,5 +1,6 @@
 \name{receive.socket}
 \alias{receive.socket}
+\alias{receive.null.msg}
 \alias{receive.string}
 \alias{receive.int}
 \alias{receive.double}
@@ -12,6 +13,7 @@ referenced by the socket argument. If there are no messages available on the spe
 }
 \usage{
 receive.socket(socket)
+receive.null.msg(socket)
 receive.string(socket)
 receive.int(socket)
 receive.double(socket)
@@ -22,6 +24,7 @@ receive.double(socket)
 }
 \value{
   the value sent from the remote server or NULL on failure.
+  or a logical for receive.null.msg indicating whether the msg was zero size.
 }
 \references{
 http://www.zeromq.org

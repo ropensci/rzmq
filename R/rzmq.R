@@ -31,12 +31,16 @@ connect.socket <- function(socket, address) {
     .Call("connectSocket", socket, address, PACKAGE="rzmq")
 }
 
-send.socket <- function(socket, data) {
-    .Call("sendSocket", socket, serialize(data,NULL), PACKAGE="rzmq")
+send.socket <- function(socket, data, send.more=FALSE) {
+    .Call("sendSocket", socket, serialize(data,NULL), send.more, PACKAGE="rzmq")
 }
 
-send.null.msg <- function(socket) {
-    .Call("sendNullMsg", socket, PACKAGE="rzmq")
+send.null.msg <- function(socket, send.more=FALSE) {
+    .Call("sendNullMsg", socket, send.more, PACKAGE="rzmq")
+}
+
+receive.null.msg <- function(socket) {
+    .Call("receiveNullMsg", socket, PACKAGE="rzmq")
 }
 
 receive.socket <- function(socket) {
