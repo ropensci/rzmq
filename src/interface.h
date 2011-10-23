@@ -37,6 +37,23 @@ extern "C" {
   SEXP receiveString(SEXP socket_);
   SEXP receiveInt(SEXP socket_);
   SEXP receiveDouble(SEXP socket_);
+  SEXP set_hwm(SEXP socket_, SEXP option_value_);
+  SEXP set_swap(SEXP socket_, SEXP option_value_);
+  SEXP set_affinity(SEXP socket_, SEXP option_value_);
+  SEXP set_identity(SEXP socket_, SEXP option_value_);
+  SEXP subscribe(SEXP socket_, SEXP option_value_);
+  SEXP unsubscribe(SEXP socket_, SEXP option_value_);
+  SEXP set_rate(SEXP socket_, SEXP option_value_);
+  SEXP set_recovery_ivl(SEXP socket_, SEXP option_value_);
+  SEXP set_recovery_ivl_msec(SEXP socket_, SEXP option_value_);
+  SEXP set_mcast_loop(SEXP socket_, SEXP option_value_);
+  SEXP set_sndbuf(SEXP socket_, SEXP option_value_);
+  SEXP set_rcvbuf(SEXP socket_, SEXP option_value_);
+  SEXP set_linger(SEXP socket_, SEXP option_value_);
+  SEXP set_reconnect_ivl(SEXP socket_, SEXP option_value_);
+  SEXP set_zmq_backlog(SEXP socket_, SEXP option_value_);
+  SEXP set_reconnect_ivl_max(SEXP socket_, SEXP option_value_);
+  SEXP get_rcvmore(SEXP socket_);
 }
 
 #endif // INTERFACE_HPP

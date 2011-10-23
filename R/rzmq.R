@@ -60,12 +60,72 @@ receive.double <- function(socket) {
     .Call("receiveDouble", socket, PACKAGE="rzmq")
 }
 
-create.sink <- function(address, num_items) {
-    .Call("createSink", address, as.integer(num_items), PACKAGE="rzmq")
+set.hwm <- function(socket, option.value) {
+    .Call("set_hwm",socket, option.value, PACKAGE="rzmq")
 }
 
-get.sink.results <- function(sink) {
-    .Call("getSinkResults", sink, PACKAGE="rzmq")
+set.swap <- function(socket, option.value) {
+    .Call("set_swap",socket, option.value, PACKAGE="rzmq")
+}
+
+set.affinity <- function(socket, option.value) {
+    .Call("set_affinity",socket, option.value, PACKAGE="rzmq")
+}
+
+set.identity <- function(socket, option.value) {
+    .Call("set_identity",socket, option.value, PACKAGE="rzmq")
+}
+
+subscribe <- function(socket, option.value) {
+    .Call("subscribe",socket, option.value, PACKAGE="rzmq")
+}
+
+unsubscribe <- function(socket, option.value) {
+    .Call("unsubscribe",socket, option.value, PACKAGE="rzmq")
+}
+
+set.rate <- function(socket, option.value) {
+    .Call("set_rate",socket, option.value, PACKAGE="rzmq")
+}
+
+set.recovery.ivl <- function(socket, option.value) {
+    .Call("set_recovery_ivl",socket, option.value, PACKAGE="rzmq")
+}
+
+set.recovery.ivl.msec <- function(socket, option.value) {
+    .Call("set_recovery_ivl_msec",socket, option.value, PACKAGE="rzmq")
+}
+
+set.mcast.loop <- function(socket, option.value) {
+    .Call("set_mcast_loop",socket, option.value, PACKAGE="rzmq")
+}
+
+set.sndbuf <- function(socket, option.value) {
+    .Call("set_sndbuf",socket, option.value, PACKAGE="rzmq")
+}
+
+set.rcvbuf <- function(socket, option.value) {
+    .Call("set_rcvbuf",socket, option.value, PACKAGE="rzmq")
+}
+
+set.linger <- function(socket, option.value) {
+    .Call("set_linger",socket, option.value, PACKAGE="rzmq")
+}
+
+set.reconnect.ivl <- function(socket, option.value) {
+    .Call("set_reconnect_ivl",socket, option.value, PACKAGE="rzmq")
+}
+
+set.zmq.backlog <- function(socket, option.value) {
+    .Call("set_zmq_backlog",socket, option.value, PACKAGE="rzmq")
+}
+
+set.reconnect.ivl.max <- function(socket, option.value) {
+    .Call("set_reconnect_ivl_max",socket, option.value, PACKAGE="rzmq")
+}
+
+get.rcvmore <- function(socket) {
+    .Call("get_rcvmore",socket,PACKAGE="rzmq")
 }
 
 zmq.cluster.lapply <- function(cluster,X,FUN,...,deathstar.port=6000,control.port=6001) {
