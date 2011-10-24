@@ -130,7 +130,11 @@ get.rcvmore <- function(socket) {
 
 zmq.cluster.lapply <- function(cluster,X,FUN,...,deathstar.port=6000,control.port=6001) {
     remote.exec <- function(socket,index,fun,...) {
-        send.socket(socket,data=list(index=index,fun=fun,args=list(...)))
+        ## expects socket to be ZMQ_DEALER
+        ## send as though this is a req message
+        ## by sending null first
+        send.null.msg(socket, send.more=TRUE)
+        send.socket(socket,data=list(index=index,fun=fun,args=list(...)),send.more=FALSE)
     }
 
     FUN <- match.fun(FUN)
@@ -174,6 +178,10 @@ zmq.cluster.lapply <- function(cluster,X,FUN,...,deathstar.port=6000,control.por
     ## pick up restuls
     ans <- vector("list",N)
     for(i in 1:N) {
+        ## outgoing msg was in form of REQ msg
+        ## but sent with DEALER socket
+        ## so we have to dissect the msg envelope
+        receive.null.msg(execution.socket)
         ans[[i]] <- receive.socket(execution.socket)
     }
 
