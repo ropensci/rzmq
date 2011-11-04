@@ -12,7 +12,7 @@ The zmq_recv() function shall receive a message from the socket
 referenced by the socket argument. If there are no messages available on the specified socket the function shall block until the request can be satisfied.
 }
 \usage{
-receive.socket(socket)
+receive.socket(socket, unserialize=TRUE)
 receive.null.msg(socket)
 receive.string(socket)
 receive.int(socket)
@@ -21,6 +21,7 @@ receive.double(socket)
 
 \arguments{
   \item{socket}{a zmq socket object}
+  \item{unserialize}{whether to call unserialize on the received data}
 }
 \value{
   the value sent from the remote server or NULL on failure.

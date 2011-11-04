@@ -10,7 +10,7 @@
   A successful invocation of send.socket does not indicate that the message has been transmitted to the network, only that it has been queued on the socket and ZMQ has assumed responsibility for the message.
 }
 \usage{
-send.socket(socket, data, send.more=FALSE)
+send.socket(socket, data, send.more=FALSE, serialize=TRUE)
 send.null.msg(socket, send.more=FALSE)
 }
 
@@ -18,6 +18,7 @@ send.null.msg(socket, send.more=FALSE)
   \item{socket}{a zmq socket object}
   \item{data}{the R object to be sent}
   \item{send.more}{whether this message has more frames to be sent}
+  \item{serialize}{whether to call serialize before sending the data}
 }
 \value{
   a boolean indicating success or failure of the operation.

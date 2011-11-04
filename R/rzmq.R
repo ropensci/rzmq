@@ -31,8 +31,12 @@ connect.socket <- function(socket, address) {
     .Call("connectSocket", socket, address, PACKAGE="rzmq")
 }
 
-send.socket <- function(socket, data, send.more=FALSE) {
-    .Call("sendSocket", socket, serialize(data,NULL), send.more, PACKAGE="rzmq")
+send.socket <- function(socket, data, send.more=FALSE, serialize=TRUE) {
+    if(serialize) {
+        data <- serialize(data,NULL)
+    }
+
+    .Call("sendSocket", socket, data, send.more, PACKAGE="rzmq")
 }
 
 send.null.msg <- function(socket, send.more=FALSE) {
@@ -43,9 +47,12 @@ receive.null.msg <- function(socket) {
     .Call("receiveNullMsg", socket, PACKAGE="rzmq")
 }
 
-receive.socket <- function(socket) {
+receive.socket <- function(socket,unserialize=TRUE) {
     ans <- .Call("receiveSocket", socket, PACKAGE="rzmq")
-    unserialize(ans)
+    if(unserialize) {
+        ans <- unserialize(ans)
+    }
+    ans
 }
 
 receive.string <- function(socket) {
@@ -133,8 +140,9 @@ zmq.cluster.lapply <- function(cluster,X,FUN,...,deathstar.port=6000,control.por
         ## expects socket to be ZMQ_DEALER
         ## send as though this is a req message
         ## by sending null first
+        data <- list(index=index,fun=fun,args=list(...))
         send.null.msg(socket, send.more=TRUE)
-        send.socket(socket,data=list(index=index,fun=fun,args=list(...)),send.more=FALSE)
+        send.socket(socket, data=data, send.more=FALSE)
     }
 
     FUN <- match.fun(FUN)
