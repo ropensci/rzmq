@@ -159,19 +159,19 @@ zmq.cluster.lapply <- function(cluster,X,FUN,...,deathstar.port=6000,control.por
     execution.socket = init.socket(context,"ZMQ_DEALER")
 
     ## connect exec socket to all remote servers
-    control.endpoints <- paste("tcp://",cluster,":",control.port,sep="")
+    ##control.endpoints <- paste("tcp://",cluster,":",control.port,sep="")
     exec.endpoints <- paste("tcp://",cluster,":",deathstar.port,sep="")
 
     ## ensure ndoes are available for execution
     ## to avoid msg hogging / slow joiner issues
-    for(node in control.endpoints) {
-        cat("checking",node,"status: ")
-        control.socket = init.socket(context,"ZMQ_REQ")
-        connect.socket(control.socket,node)
-        send.null.msg(control.socket)
-        status <- receive.string(control.socket)
-        cat(status,"\n")
-    }
+    ## for(node in control.endpoints) {
+    ##     cat("checking",node,"status: ")
+    ##     control.socket = init.socket(context,"ZMQ_REQ")
+    ##     connect.socket(control.socket,node)
+    ##     send.null.msg(control.socket)
+    ##     status <- receive.string(control.socket)
+    ##     cat(status,"\n")
+    ## }
 
     ## connect to remote nodes
     for(node in exec.endpoints) {
