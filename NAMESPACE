@@ -28,6 +28,5 @@ export(
        set.reconnect.ivl,
        set.zmq.backlog,
        set.reconnect.ivl.max,
-       get.rcvmore,
-       zmq.cluster.lapply
+       get.rcvmore
        )
