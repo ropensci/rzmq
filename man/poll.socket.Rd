@@ -1,6 +1,6 @@
 \name{poll.socket}
 \alias{poll.socket}
-\title{Polls a list of sockets, waiting for the presence of a nonblocking read, write, or an error condition.}
+\title{Polls a list of sockets, waiting for the presence of a nonblocking read, write, or error event.}
 \description{The zmq_poll() function shall poll a list of a sockets for either read, write, or error conditions subject to a millisecond resolution timeout.}
 \usage{
     socket.poll(sockets, events, timeout=0L)
@@ -11,7 +11,7 @@
     \item{events}{a list of character vectors containing one or more events in \{read, write, error\}. The first element in the list corresponds to the first zmq socket, and so on...}
     \item{timeout}{the numbers of seconds to wait for events. Fractional seconds are supported. ZeroMQ guarantees at most millisecond resolution. A timeout of -1L blocks until an event occurs; a timeout of 0L is non-blocking.}
 }
-\value{A list of pairlists corresponding to the input zmq sockets. Each list has one of more tags from \{read, write, error\} with logical values indicating the results of the poll operation.}
+\value{A list of pairlists corresponding to the polled zmq sockets. Each list has one of more tags from \{read, write, error\} with logical values indicating the results of the poll operation.}
 
 \references{
 http://www.zeromq.org
@@ -41,7 +41,7 @@ connect.socket(out.socket,"tcp://*:5557")
 
 # Poll the REP and REQ sockets for all events.
 events <- poll.socket(list(in.socket, out.socket),
-                      list(c("read" , "write", "error"),
+                      list(c("read", "write", "error"),
                            c("read", "write", "error")),
                       timeout=0L)
 
@@ -57,7 +57,7 @@ paste("Is downstream REQ socket writable without blocking?", events[[2]]$write)
 send.socket(out.socket, "Hello World")
 
 events <- poll.socket(list(in.socket, out.socket),
-                      list(c("read" , "write", "error"),
+                      list(c("read", "write", "error"),
                            c("read", "write", "error")),
                       timeout=0L)
 
@@ -70,7 +70,7 @@ paste("Is downstream REQ socket writable without blocking?", events[[2]]$write)
 receive.socket(in.socket)
 
 events <- poll.socket(list(in.socket, out.socket),
-                      list(c("read" , "write", "error"),
+                      list(c("read", "write", "error"),
                            c("read", "write", "error")),
                       timeout=0L)
 
@@ -83,17 +83,17 @@ paste("Is downstream REQ socket writable without blocking?", events[[2]]$write)
 send.socket(in.socket, "Greetings")
 
 events <- poll.socket(list(in.socket, out.socket),
-                      list(c("read" , "write", "error"),
+                      list(c("read", "write", "error"),
                            c("read", "write", "error")),
                       timeout=0L)
 
-# The REP response is waiting on the REQ socket.
+# The REP response is waiting to be read on the REQ socket.
 paste("Is upstream REP socket readable without blocking?", events[[1]]$read)
 paste("Is upstream REP socket writable without blocking?", events[[1]]$write)
 paste("Is downstream REQ socket readable without blocking?", events[[2]]$read)
 paste("Is downstream REQ socket writable without blocking?", events[[2]]$write)
 
-# Complete the REP-REQ transaction cycling by reading
+# Complete the REP-REQ transaction cycle by reading
 # the REP response.
 receive.socket(out.socket)
 }}
