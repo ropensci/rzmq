@@ -12,6 +12,7 @@ export(
        receive.string,
        receive.int,
        receive.double,
+       poll.socket,
        set.hwm,
        set.swap,
        set.affinity,
