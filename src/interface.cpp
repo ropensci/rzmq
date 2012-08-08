@@ -762,6 +762,14 @@ SEXP get_rcvmore(SEXP socket_) {
   return ans;
 }
 
+SEXP zmqVersion() {
+    SEXP ans;
+    PROTECT(ans = allocVector(INTSXP, 3));
+    zmq::version(&INTEGER(ans)[0], &INTEGER(ans)[1], &INTEGER(ans)[2]);
+    UNPROTECT(1);
+    return ans;
+}
+
 // #define ZMQ_RCVMORE 13
 // #define ZMQ_FD 14
 // #define ZMQ_EVENTS 15
