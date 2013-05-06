@@ -1,7 +1,6 @@
 useDynLib(rzmq)
 
-export(
-       init.context,
+export(init.context,
        init.socket,
        bind.socket,
        connect.socket,
@@ -9,6 +8,7 @@ export(
        send.null.msg,
        receive.null.msg,
        receive.socket,
+       send.raw.string,
        receive.string,
        receive.int,
        receive.double,

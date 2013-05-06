@@ -55,6 +55,10 @@ receive.socket <- function(socket,unserialize=TRUE) {
     ans
 }
 
+send.raw.string <- function(socket,data,send.more=FALSE) {
+    .Call("sendRawString", socket, data, send.more, PACKAGE="rzmq")
+}
+
 receive.string <- function(socket) {
     .Call("receiveString", socket, PACKAGE="rzmq")
 }
