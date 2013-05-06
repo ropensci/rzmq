@@ -282,24 +282,21 @@ SEXP receiveSocket(SEXP socket_) {
 
 
 SEXP sendRawString(SEXP socket_, SEXP data_, SEXP send_more_) {
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1));
+  SEXP ans;
   bool status(false);
   if(TYPEOF(data_) != STRSXP) {
     REprintf("data type must be raw (STRSXP).\n");
-    UNPROTECT(1);
     return R_NilValue;
   }
 
   if(TYPEOF(send_more_) != LGLSXP) {
     REprintf("send.more type must be logical (LGLSXP).\n");
-    UNPROTECT(1);
     return R_NilValue;
   }
 
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) {
     REprintf("bad socket object.\n");
-    UNPROTECT(1);
     return R_NilValue;
   }
 
@@ -317,6 +314,7 @@ SEXP sendRawString(SEXP socket_, SEXP data_, SEXP send_more_) {
   } catch(std::exception& e) {
     REprintf("%s\n",e.what());
   }
+  PROTECT(ans = allocVector(LGLSXP,1));
   LOGICAL(ans)[0] = static_cast<int>(status);
   UNPROTECT(1);
   return ans;
