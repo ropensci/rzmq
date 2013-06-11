@@ -1,6 +1,7 @@
 useDynLib(rzmq)
 
-export(init.context,
+export(zmq.version,
+       init.context,
        init.socket,
        bind.socket,
        connect.socket,

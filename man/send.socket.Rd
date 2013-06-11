@@ -1,6 +1,7 @@
 \name{send.socket}
 \alias{send.socket}
 \alias{send.null.msg}
+\alias{send.raw.string}
 \title{
   send a message.
 }
@@ -12,6 +13,7 @@
 \usage{
 send.socket(socket, data, send.more=FALSE, serialize=TRUE)
 send.null.msg(socket, send.more=FALSE)
+send.raw.string(socket,data,send.more=FALSE)
 }
 
 \arguments{

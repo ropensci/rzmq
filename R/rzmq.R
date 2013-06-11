@@ -15,6 +15,10 @@
 ## along with this program.  If not, see <http:##www.gnu.org#licenses#>. ##
 ###########################################################################
 
+zmq.version <- function() {
+    .Call("get_zmq_version", PACKAGE="rzmq")
+}
+
 init.context <- function() {
     .Call("initContext", PACKAGE="rzmq")
 }
@@ -24,11 +28,11 @@ init.socket <- function(context, socket.type) {
 }
 
 bind.socket <- function(socket, address) {
-    .Call("bindSocket", socket, address, PACKAGE="rzmq")
+    invisible(.Call("bindSocket", socket, address, PACKAGE="rzmq"))
 }
 
 connect.socket <- function(socket, address) {
-    .Call("connectSocket", socket, address, PACKAGE="rzmq")
+    invisible(.Call("connectSocket", socket, address, PACKAGE="rzmq"))
 }
 
 send.socket <- function(socket, data, send.more=FALSE, serialize=TRUE) {
@@ -36,7 +40,7 @@ send.socket <- function(socket, data, send.more=FALSE, serialize=TRUE) {
         data <- serialize(data,NULL)
     }
 
-    .Call("sendSocket", socket, data, send.more, PACKAGE="rzmq")
+    invisible(.Call("sendSocket", socket, data, send.more, PACKAGE="rzmq"))
 }
 
 send.null.msg <- function(socket, send.more=FALSE) {
@@ -72,11 +76,19 @@ receive.double <- function(socket) {
 }
 
 set.hwm <- function(socket, option.value) {
-    .Call("set_hwm",socket, option.value, PACKAGE="rzmq")
+    if(zmq.version() >= "3.0.0") {
+        stop("ZMQ_HWM removed from libzmq3")
+    } else {
+        .Call("set_hwm",socket, option.value, PACKAGE="rzmq")
+    }
 }
 
 set.swap <- function(socket, option.value) {
-    .Call("set_swap",socket, option.value, PACKAGE="rzmq")
+    if(zmq.version() >= "3.0.0") {
+        stop("ZMQ_SWAP removed from libzmq3")
+    } else {
+        .Call("set_swap",socket, option.value, PACKAGE="rzmq")
+    }
 }
 
 set.affinity <- function(socket, option.value) {
@@ -88,7 +100,7 @@ set.identity <- function(socket, option.value) {
 }
 
 subscribe <- function(socket, option.value) {
-    .Call("subscribe",socket, option.value, PACKAGE="rzmq")
+    invisible(.Call("subscribe",socket, option.value, PACKAGE="rzmq"))
 }
 
 unsubscribe <- function(socket, option.value) {
@@ -104,11 +116,19 @@ set.recovery.ivl <- function(socket, option.value) {
 }
 
 set.recovery.ivl.msec <- function(socket, option.value) {
-    .Call("set_recovery_ivl_msec",socket, option.value, PACKAGE="rzmq")
+    if(zmq.version() >= "3.0.0") {
+        stop("ZMQ_RECOVERY_IVL_MSEC removed from libzmq3")
+    } else {
+        .Call("set_recovery_ivl_msec",socket, option.value, PACKAGE="rzmq")
+    }
 }
 
 set.mcast.loop <- function(socket, option.value) {
-    .Call("set_mcast_loop",socket, option.value, PACKAGE="rzmq")
+    if(zmq.version() >= "3.0.0") {
+        stop("ZMQ_MCAST_LOOP removed from libzmq3")
+    } else {
+        .Call("set_mcast_loop",socket, option.value, PACKAGE="rzmq")
+    }
 }
 
 set.sndbuf <- function(socket, option.value) {

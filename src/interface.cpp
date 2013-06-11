@@ -17,9 +17,22 @@
 
 #include <stdint.h>
 #include <string>
+#include <sstream>
 #include <stdexcept>
 #include <zmq.hpp>
 #include "interface.h"
+
+SEXP get_zmq_version() {
+  SEXP ans;
+  int major, minor, patch;
+  std::stringstream out;
+  zmq::version(&major, &minor, &patch);
+  out << major << "." << minor << "." << patch;
+  PROTECT(ans = allocVector(STRSXP,1));
+  SET_STRING_ELT(ans, 0, mkChar(out.str().c_str()));
+  UNPROTECT(1);
+  return ans;
+}
 
 int string_to_socket_type(const std::string s) {
   if(s == "ZMQ_PAIR") {
@@ -394,6 +407,8 @@ SEXP receiveDouble(SEXP socket_) {
   return R_NilValue;
 }
 
+#if ZMQ_VERSION_MAJOR < 3
+// removed from libzmq3
 SEXP set_hwm(SEXP socket_, SEXP option_value_) {
 
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
@@ -412,6 +427,10 @@ SEXP set_hwm(SEXP socket_, SEXP option_value_) {
   return ans;
 }
 
+#endif
+
+#if ZMQ_VERSION_MAJOR < 3
+// removed from libzmq3
 SEXP set_swap(SEXP socket_, SEXP option_value_) {
 
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
@@ -429,7 +448,7 @@ SEXP set_swap(SEXP socket_, SEXP option_value_) {
   UNPROTECT(1);
   return ans;
 }
-
+#endif
 
 SEXP set_affinity(SEXP socket_, SEXP option_value_) {
 
@@ -536,6 +555,9 @@ SEXP set_recovery_ivl(SEXP socket_, SEXP option_value_) {
   return ans;
 }
 
+
+#if ZMQ_VERSION_MAJOR < 3
+// removed from libzmq3
 SEXP set_recovery_ivl_msec(SEXP socket_, SEXP option_value_) {
 
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
@@ -553,7 +575,10 @@ SEXP set_recovery_ivl_msec(SEXP socket_, SEXP option_value_) {
   UNPROTECT(1);
   return ans;
 }
+#endif
 
+#if ZMQ_VERSION_MAJOR < 3
+// removed from libzmq3
 SEXP set_mcast_loop(SEXP socket_, SEXP option_value_) {
 
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
@@ -571,6 +596,7 @@ SEXP set_mcast_loop(SEXP socket_, SEXP option_value_) {
   UNPROTECT(1);
   return ans;
 }
+#endif
 
 SEXP set_sndbuf(SEXP socket_, SEXP option_value_) {
 
