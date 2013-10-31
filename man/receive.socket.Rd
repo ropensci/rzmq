@@ -37,7 +37,7 @@ ZMQ was written by Martin Sustrik <sustrik@250bpm.com> and Martin Lucina <mato@k
 rzmq was written by Whit Armstrong.
 }
 \seealso{
-  \code{\link{connect.socket},\link{bind.socket},\link{receive.socket},\link{send.socket}}
+  \code{\link{connect.socket},\link{bind.socket},\link{receive.socket},\link{send.socket},\link{poll.socket}}
 }
 \examples{\dontrun{
 library(rzmq)

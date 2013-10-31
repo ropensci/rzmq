@@ -170,6 +170,109 @@ SEXP bindSocket(SEXP socket_, SEXP address_) {
   return ans;
 }
 
+static short rzmq_build_event_bitmask(SEXP askevents) {
+    short bitmask = 0;
+    if(TYPEOF(askevents) == STRSXP) {
+        for (int i = 0; i < LENGTH(askevents); i++) {
+            const char *ask = translateChar(STRING_ELT(askevents, i));
+            if (strcmp(ask, "read") == 0) {
+                bitmask |= ZMQ_POLLIN;
+            } else if (strcmp(ask, "write") == 0) {
+                bitmask |= ZMQ_POLLOUT;
+            } else if (strcmp(ask, "error") == 0) {
+                bitmask |= ZMQ_POLLERR;
+            } else {
+                error("unrecognized requests poll event %s.", ask);
+            }
+        }
+    } else {
+        error("event list passed to poll must be a string or vector of strings");
+    }
+    return bitmask;
+}
+
+SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
+    SEXP result;
+    
+    if(TYPEOF(timeout_) != INTSXP) {
+        error("poll timeout must be an integer.");
+    }
+
+    if(TYPEOF(sockets_) != VECSXP || LENGTH(sockets_) == 0) {
+        error("A non-empy list of sockets is required as first argument.");
+    }
+
+    int nsock = LENGTH(sockets_);
+    PROTECT(result = allocVector(VECSXP, nsock));
+
+    if (TYPEOF(events_) != VECSXP) {
+        error("event list must be a list of strings or a list of vectors of strings.");
+    }
+    if(LENGTH(events_) != nsock) {
+        error("event list must be the same length as socket list.");
+    }
+
+    zmq_pollitem_t *pitems = (zmq_pollitem_t*)R_alloc(nsock, sizeof(zmq_pollitem_t));
+    if (pitems == NULL) {
+        error("failed to allocate memory for zmq_pollitem_t array.");
+    }
+
+    try {
+        for (int i = 0; i < nsock; i++) {
+            zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(VECTOR_ELT(sockets_, i), "zmq::socket_t*"));
+            pitems[i].socket = (void*)*socket;
+            pitems[i].events = rzmq_build_event_bitmask(VECTOR_ELT(events_, i));
+        }
+
+        int rc = zmq::poll(pitems, nsock, *INTEGER(timeout_));
+
+        if(rc >= 0) {
+            for (int i = 0; i < nsock; i++) {
+                SEXP events, names;
+
+                // Pre count number of polled events so we can
+                // allocate appropriately sized lists.
+                short eventcount = 0;
+                if (pitems[i].events & ZMQ_POLLIN) eventcount++;
+                if (pitems[i].events & ZMQ_POLLOUT) eventcount++;
+                if (pitems[i].events & ZMQ_POLLERR) eventcount++;
+
+                PROTECT(events = allocVector(VECSXP, eventcount));
+                PROTECT(names = allocVector(VECSXP, eventcount));
+
+                eventcount = 0;
+                if (pitems[i].events & ZMQ_POLLIN) {
+                    SET_VECTOR_ELT(events, eventcount, ScalarLogical(pitems[i].revents & ZMQ_POLLIN));
+                    SET_VECTOR_ELT(names, eventcount, mkChar("read"));
+                    eventcount++;
+                }
+
+                if (pitems[i].events & ZMQ_POLLOUT) {
+                    SET_VECTOR_ELT(names, eventcount, mkChar("write"));
+
+                    SET_VECTOR_ELT(events, eventcount, ScalarLogical(pitems[i].revents & ZMQ_POLLOUT));
+                    eventcount++;
+                }
+
+                if (pitems[i].events & ZMQ_POLLERR) {
+                    SET_VECTOR_ELT(names, eventcount, mkChar("error"));
+                    SET_VECTOR_ELT(events, eventcount, ScalarLogical(pitems[i].revents & ZMQ_POLLERR));
+                }
+                setAttrib(events, R_NamesSymbol, names);
+                SET_VECTOR_ELT(result, i, events);
+            }
+        } else {
+            error("polling zmq sockets failed.");
+        }
+    } catch(std::exception& e) {
+        error(e.what());
+    }
+    // Release the result list (1), and per socket
+    // events lists with associated names (2*nsock).
+    UNPROTECT(1 + 2*nsock);
+    return result;
+}
+
 SEXP connectSocket(SEXP socket_, SEXP address_) {
   SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 

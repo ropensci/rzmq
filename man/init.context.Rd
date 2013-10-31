@@ -32,7 +32,7 @@ init.socket(context, socket.type)
 }
 
 \seealso{
-  \code{\link{connect.socket},\link{bind.socket},\link{receive.socket},\link{send.socket}}
+  \code{\link{connect.socket},\link{bind.socket},\link{receive.socket},\link{send.socket},\link{poll.socket}}
 }
 
 \examples{\dontrun{

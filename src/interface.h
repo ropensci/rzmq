@@ -58,6 +58,7 @@ extern "C" {
   SEXP set_zmq_backlog(SEXP socket_, SEXP option_value_);
   SEXP set_reconnect_ivl_max(SEXP socket_, SEXP option_value_);
   SEXP get_rcvmore(SEXP socket_);
+  SEXP pollSocket(SEXP socket_, SEXP events_, SEXP timeout_);
 }
 
 #endif // INTERFACE_HPP

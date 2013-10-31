@@ -75,6 +75,11 @@ receive.double <- function(socket) {
     .Call("receiveDouble", socket, PACKAGE="rzmq")
 }
 
+poll.socket <- function(sockets, events, timeout=0L) {
+    if (timeout != -1L) timeout <- as.integer(timeout * 1000000)
+    .Call("pollSocket", sockets, events, timeout)
+}
+
 set.hwm <- function(socket, option.value) {
     if(zmq.version() >= "3.0.0") {
         stop("ZMQ_HWM removed from libzmq3")
