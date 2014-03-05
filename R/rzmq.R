@@ -59,6 +59,21 @@ receive.socket <- function(socket,unserialize=TRUE) {
     ans
 }
 
+receive.multipart <- function(socket) {
+  parts = rawToChar(receive.socket(socket, unserialize=FALSE))
+  while(get.rcvmore(socket)) {
+    parts = append(parts, rawToChar(receive.socket(socket, unserialize=FALSE)))
+  }
+  return(parts)
+}
+
+send.multipart <- function(socket, parts) {
+  for (part in parts[1:(length(parts)-1)]) {
+    send.raw.string(socket, part, send.more=TRUE)
+  }
+  send.raw.string(socket, parts[length(parts)], send.more=FALSE)
+}
+
 send.raw.string <- function(socket,data,send.more=FALSE) {
     .Call("sendRawString", socket, data, send.more, PACKAGE="rzmq")
 }
