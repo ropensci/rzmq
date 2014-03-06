@@ -19,7 +19,8 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
-#include <zmq.hpp>
+#define NDEBUG
+#include "cppzmq.h"
 #include "interface.h"
 
 SEXP get_zmq_version() {
