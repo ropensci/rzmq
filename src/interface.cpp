@@ -628,8 +628,13 @@ SEXP set_rate(SEXP socket_, SEXP option_value_) {
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
   SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+#if ZMQ_VERSION_MAJOR > 2
+  int option_value;
+#else
+  int64_t option_value;
+#endif
 
-  int64_t option_value(INTEGER(option_value_)[0]);
+  option_value = INTEGER(option_value_)[0];
   try {
     socket->setsockopt(ZMQ_RATE, &option_value, sizeof(int64_t));
   } catch(std::exception& e) {
@@ -646,8 +651,12 @@ SEXP set_recovery_ivl(SEXP socket_, SEXP option_value_) {
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
   SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
-
-  int64_t option_value(INTEGER(option_value_)[0]);
+#if ZMQ_VERSION_MAJOR > 2
+  int option_value;
+#else
+  int64_t option_value;
+#endif
+  option_value = INTEGER(option_value_)[0];
   try {
     socket->setsockopt(ZMQ_RECOVERY_IVL, &option_value, sizeof(int64_t));
   } catch(std::exception& e) {
@@ -708,7 +717,13 @@ SEXP set_sndbuf(SEXP socket_, SEXP option_value_) {
   if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
   SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 
-  uint64_t option_value(INTEGER(option_value_)[0]);
+#if ZMQ_VERSION_MAJOR > 2
+  int option_value;
+#else
+  int64_t option_value;
+#endif
+
+  option_value = INTEGER(option_value_)[0];
   try {
     socket->setsockopt(ZMQ_SNDBUF, &option_value, sizeof(uint64_t));
   } catch(std::exception& e) {
@@ -726,7 +741,13 @@ SEXP set_rcvbuf(SEXP socket_, SEXP option_value_) {
   if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
   SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 
-  uint64_t option_value(INTEGER(option_value_)[0]);
+#if ZMQ_VERSION_MAJOR > 2
+  int option_value;
+#else
+  int64_t option_value;
+#endif
+
+  option_value = INTEGER(option_value_)[0];
   try {
     socket->setsockopt(ZMQ_RCVBUF, &option_value, sizeof(uint64_t));
   } catch(std::exception& e) {
@@ -814,8 +835,11 @@ SEXP get_rcvmore(SEXP socket_) {
 
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
-
+#if ZMQ_VERSION_MAJOR > 2
+  int option_value;
+#else
   int64_t option_value;
+#endif
   size_t option_value_len = sizeof(option_value);
   try {
     socket->getsockopt(ZMQ_RCVMORE, &option_value, &option_value_len);
