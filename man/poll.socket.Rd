@@ -3,7 +3,7 @@
 \title{Polls a list of sockets, waiting for the presence of a nonblocking read, write, or error event.}
 \description{The zmq_poll() function shall poll a list of a sockets for either read, write, or error conditions subject to a millisecond resolution timeout.}
 \usage{
-    socket.poll(sockets, events, timeout=0L)
+    poll.socket(sockets, events, timeout=0L)
 }
 
 \arguments{
