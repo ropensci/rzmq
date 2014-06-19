@@ -178,3 +178,7 @@ set.reconnect.ivl.max <- function(socket, option.value) {
 get.rcvmore <- function(socket) {
     .Call("get_rcvmore",socket,PACKAGE="rzmq")
 }
+
+zmq.version <- function(socket) {
+    .Call("zmqVersion", PACKAGE="rzmq")
+}

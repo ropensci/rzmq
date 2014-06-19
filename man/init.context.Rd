@@ -1,6 +1,7 @@
 \name{init.context}
 \alias{init.context}
 \alias{init.socket}
+\alias{zmq.version}
 \title{
   initailize zmq context and zmq socket
 }
@@ -10,6 +11,7 @@
 \usage{
 init.context()
 init.socket(context, socket.type)
+zmq.version()
 }
 
 \arguments{
@@ -19,7 +21,8 @@ init.socket(context, socket.type)
 }
 \value{
   \code{init.context}{ returns a zmq context object.}
-  \code{init.socket}{returns a zmq socket object.}
+  \code{init.socket}{ returns a zmq socket object.}
+  \code{zmq.version}{ returns the major, minor, and patch versions for the system zmq library.}
 }
 \references{
   http://www.zeromq.org
