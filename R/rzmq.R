@@ -60,18 +60,18 @@ receive.socket <- function(socket,unserialize=TRUE) {
 }
 
 receive.multipart <- function(socket) {
-  parts = rawToChar(receive.socket(socket, unserialize=FALSE))
+  parts = list(receive.socket(socket, unserialize=FALSE))
   while(get.rcvmore(socket)) {
-    parts = append(parts, rawToChar(receive.socket(socket, unserialize=FALSE)))
+    parts = append(parts, list(receive.socket(socket, unserialize=FALSE)))
   }
   return(parts)
 }
 
 send.multipart <- function(socket, parts) {
   for (part in parts[1:(length(parts)-1)]) {
-    send.raw.string(socket, part, send.more=TRUE)
+    send.socket(socket, part, send.more=TRUE, serialize=FALSE)
   }
-  send.raw.string(socket, parts[length(parts)], send.more=FALSE)
+  send.socket(socket, parts[[length(parts)]], send.more=FALSE, serialize=FALSE)
 }
 
 send.raw.string <- function(socket,data,send.more=FALSE) {
