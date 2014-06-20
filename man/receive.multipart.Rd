@@ -8,6 +8,6 @@ receive.multipart(socket)
   \item{socket}{The ZMQ socket from which to receive data}
 }
 \description{
-Returns a string vector, one element per message part.
+  Returns a list of raw vectors for the parts of a multipart message.
 }
 
