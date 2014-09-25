@@ -19,7 +19,6 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
-#define NDEBUG
 #include "cppzmq.h"
 #include "interface.h"
 
@@ -376,24 +375,38 @@ SEXP receiveNullMsg(SEXP socket_) {
   return ans;
 }
 
-SEXP receiveSocket(SEXP socket_) {
-  SEXP ans;
+SEXP receiveSocket(SEXP socket_, SEXP flags_) {
+  SEXP ans, sflags;
   bool status(false);
   zmq::message_t msg;
+  int flags;
+  int nflag = length(flags_);
+  if (nflag < 1) {
+    flags = 0;
+  } else {
+    flags = INTEGER(flags_)[0];
+  }
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   try {
-    status = socket->recv(&msg);
+    status = socket->recv(&msg, flags);
   } catch(std::exception& e) {
     REprintf("%s\n",e.what());
   }
+
+  if (0 == status && errno == EAGAIN) {
+    PROTECT(ans = allocVector(INTSXP,1));
+    INTEGER(ans)[0] = -1;
+    UNPROTECT(1);
+    return ans;
+  }
+
   if(status) {
     PROTECT(ans = allocVector(RAWSXP,msg.size()));
     memcpy(RAW(ans),msg.data(),msg.size());
     UNPROTECT(1);
     return ans;
   }
-
   return R_NilValue;
 }
 

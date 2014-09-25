@@ -9,10 +9,22 @@ Receive a message from the socket referenced by the socket argument .
 }
 \description{
 The zmq_recv() function shall receive a message from the socket
-referenced by the socket argument. If there are no messages available on the specified socket the function shall block until the request can be satisfied.
+referenced by the socket argument. If there are no messages available
+on the specified socket, by default the function shall block until the request
+can be satisfied.
+A non-blocking receive can be obtained by passing the value ZMQ_DONTWAIT
+to the flags parameter. The following non-default flags are allowed:
+
+ZMQ_DONTWAIT(integer value 1):
+
+Specifies that the operation should be performed in
+           non-blocking mode. If there are no messages available on the
+           specified socket, the receive.socket() call will return -1
+           immediately.
+
 }
 \usage{
-receive.socket(socket, unserialize=TRUE)
+receive.socket(socket, unserialize=TRUE, flags=0)
 receive.null.msg(socket)
 receive.string(socket)
 receive.int(socket)
@@ -20,12 +32,15 @@ receive.double(socket)
 }
 
 \arguments{
-  \item{socket}{a zmq socket object}
-  \item{unserialize}{whether to call unserialize on the received data}
+\item{socket}{a zmq socket object}
+\item{unserialize}{whether to call unserialize on the received data}
+\item{flags}{defaults to 0, for blocking receive. Set to ZMQ_DONTWAIT for non-blocking receive.}
 }
 \value{
   the value sent from the remote server or NULL on failure.
-  or a logical for receive.null.msg indicating whether the msg was zero size.
+  or a logical for receive.null.msg indicating whether the msg was zero
+  size. If flags was ZMQ_DONTWAIT and a message was not immediately
+  available for receipt, the value returned is -1.
 }
 \references{
 http://www.zeromq.org

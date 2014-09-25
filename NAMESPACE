@@ -32,5 +32,6 @@ export(zmq.version,
        set.reconnect.ivl,
        set.zmq.backlog,
        set.reconnect.ivl.max,
-       get.rcvmore
+       get.rcvmore,
+       ZMQ_DONTWAIT
        )

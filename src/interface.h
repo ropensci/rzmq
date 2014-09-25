@@ -37,7 +37,7 @@ extern "C" {
   SEXP sendNullMsg(SEXP socket_, SEXP send_more_);
   SEXP receiveNullMsg(SEXP socket_);
   SEXP sendRawString(SEXP socket_, SEXP data_, SEXP send_more_);
-  SEXP receiveSocket(SEXP socket_);
+  SEXP receiveSocket(SEXP socket_, SEXP flags_);
   SEXP receiveString(SEXP socket_);
   SEXP receiveInt(SEXP socket_);
   SEXP receiveDouble(SEXP socket_);
