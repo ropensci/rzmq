@@ -33,5 +33,7 @@ export(zmq.version,
        set.zmq.backlog,
        set.reconnect.ivl.max,
        get.rcvmore,
+       set.send.timeout,
+       get.send.timeout,
        ZMQ_DONTWAIT
        )

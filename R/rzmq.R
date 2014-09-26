@@ -183,3 +183,11 @@ set.reconnect.ivl.max <- function(socket, option.value) {
 get.rcvmore <- function(socket) {
     .Call("get_rcvmore",socket,PACKAGE="rzmq")
 }
+
+set.send.timeout <- function(socket, option.value) {
+    .Call("set_sndtimeo", socket, option.value, PACKAGE="rzmq")
+}
+
+get.send.timeout <- function(socket) {
+    .Call("get_sndtimeo", socket, PACKAGE="rzmq")
+}
