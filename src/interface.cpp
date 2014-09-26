@@ -389,6 +389,7 @@ SEXP receiveSocket(SEXP socket_, SEXP flags_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   try {
+    errno = 0; // we don't want a stale errno value to fool us.
     status = socket->recv(&msg, flags);
   } catch(std::exception& e) {
     REprintf("%s\n",e.what());
