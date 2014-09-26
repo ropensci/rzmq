@@ -56,8 +56,8 @@ receive.null.msg <- function(socket) {
 receive.socket <- function(socket, unserialize=TRUE, flags=0) {
   ans <- .Call("receiveSocket", socket, as.integer(flags), PACKAGE="rzmq")
 
-  if (class(ans) == "integer" && length(ans) == 1 && ans == -1) {
-    return (-1) # non-blocking requested and no message available.
+  if (length(ans) == 1 && ans < 0) {
+    return (ans) # non-blocking requested and no message available.
   } else if(unserialize) {
     ans <- unserialize(ans)
   }

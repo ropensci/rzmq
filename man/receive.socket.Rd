@@ -37,10 +37,9 @@ receive.double(socket)
 \item{flags}{defaults to 0, for blocking receive. Set to ZMQ_DONTWAIT for non-blocking receive.}
 }
 \value{
-  the value sent from the remote server or NULL on failure.
-  or a logical for receive.null.msg indicating whether the msg was zero
-  size. If flags was ZMQ_DONTWAIT and a message was not immediately
-  available for receipt, the value returned is -1.
+  the value sent from the remote server or as.integer(-1 * errno) on failure.
+  If flags was ZMQ_DONTWAIT and a message was not immediately
+  available for receipt, the integer value returned is -11 or -1 * EAGAIN.
 }
 \references{
 http://www.zeromq.org

@@ -376,7 +376,7 @@ SEXP receiveNullMsg(SEXP socket_) {
 }
 
 SEXP receiveSocket(SEXP socket_, SEXP flags_) {
-  SEXP ans, sflags;
+  SEXP ans;
   bool status(false);
   zmq::message_t msg;
   int flags;
@@ -394,9 +394,11 @@ SEXP receiveSocket(SEXP socket_, SEXP flags_) {
     REprintf("%s\n",e.what());
   }
 
-  if (0 == status && errno == EAGAIN) {
+  if (0 == status || -1 == status) {
+    // the ZMQ api spec says we should expect -1, but we get 0 in practice.
+    // Handle both in case someone 'fixes' it/or if there is an actual error.
     PROTECT(ans = allocVector(INTSXP,1));
-    INTEGER(ans)[0] = -1;
+    INTEGER(ans)[0] = -errno;
     UNPROTECT(1);
     return ans;
   }
