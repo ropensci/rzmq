@@ -37,7 +37,7 @@ extern "C" {
   SEXP sendNullMsg(SEXP socket_, SEXP send_more_);
   SEXP receiveNullMsg(SEXP socket_);
   SEXP sendRawString(SEXP socket_, SEXP data_, SEXP send_more_);
-  SEXP receiveSocket(SEXP socket_);
+  SEXP receiveSocket(SEXP socket_, SEXP flags_);
   SEXP receiveString(SEXP socket_);
   SEXP receiveInt(SEXP socket_);
   SEXP receiveDouble(SEXP socket_);
@@ -59,6 +59,8 @@ extern "C" {
   SEXP set_reconnect_ivl_max(SEXP socket_, SEXP option_value_);
   SEXP get_rcvmore(SEXP socket_);
   SEXP pollSocket(SEXP socket_, SEXP events_, SEXP timeout_);
+  SEXP get_sndtimeo(SEXP socket_);
+  SEXP set_sndtimeo(SEXP socket_, SEXP option_value_);
 }
 
 #endif // INTERFACE_HPP

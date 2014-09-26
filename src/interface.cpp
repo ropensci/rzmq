@@ -19,7 +19,6 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
-#define NDEBUG
 #include "cppzmq.h"
 #include "interface.h"
 
@@ -317,6 +316,7 @@ SEXP sendSocket(SEXP socket_, SEXP data_, SEXP send_more_) {
 
   bool send_more = LOGICAL(send_more_)[0];
   try {
+    errno = 0;
     if(send_more) {
       status = socket->send(msg,ZMQ_SNDMORE);
     } else {
@@ -376,20 +376,35 @@ SEXP receiveNullMsg(SEXP socket_) {
   return ans;
 }
 
-SEXP receiveSocket(SEXP socket_) {
+SEXP receiveSocket(SEXP socket_, SEXP flags_) {
   SEXP ans;
   bool status(false);
   zmq::message_t msg;
+  int flags;
+  int nflag = length(flags_);
+  if (nflag < 1) {
+    flags = 0;
+  } else {
+    flags = INTEGER(flags_)[0];
+  }
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   try {
-    status = socket->recv(&msg);
+    errno = 0;
+    status = socket->recv(&msg, flags);
   } catch(std::exception& e) {
     REprintf("%s\n",e.what());
+    status = false;
   }
+
   if(status) {
     PROTECT(ans = allocVector(RAWSXP,msg.size()));
     memcpy(RAW(ans),msg.data(),msg.size());
+    UNPROTECT(1);
+    return ans;
+  } else {
+    PROTECT(ans = allocVector(INTSXP,1));
+    INTEGER(ans)[0] = -errno;
     UNPROTECT(1);
     return ans;
   }
@@ -827,6 +842,46 @@ SEXP set_reconnect_ivl_max(SEXP socket_, SEXP option_value_) {
     REprintf("%s\n",e.what());
     LOGICAL(ans)[0] = 0;
   }
+  UNPROTECT(1);
+  return ans;
+}
+
+SEXP set_sndtimeo(SEXP socket_, SEXP option_value_) {
+
+  zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
+  if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
+  if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
+  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+
+  int option_value(INTEGER(option_value_)[0]);
+  try {
+    socket->setsockopt(ZMQ_SNDTIMEO, &option_value, sizeof(int));
+  } catch(std::exception& e) {
+    REprintf("%s\n",e.what());
+    LOGICAL(ans)[0] = 0;
+  }
+  UNPROTECT(1);
+  return ans;
+}
+
+SEXP get_sndtimeo(SEXP socket_) {
+
+  zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
+  if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
+#if ZMQ_VERSION_MAJOR > 2
+  int option_value;
+#else
+  int64_t option_value;
+#endif
+  size_t option_value_len = sizeof(option_value);
+  try {
+    socket->getsockopt(ZMQ_SNDTIMEO, &option_value, &option_value_len);
+  } catch(std::exception& e) {
+    REprintf("%s\n",e.what());
+    return R_NilValue;
+  }
+  SEXP ans; PROTECT(ans = allocVector(REALSXP,1));
+  REAL(ans)[0] = static_cast<int>(option_value);
   UNPROTECT(1);
   return ans;
 }
