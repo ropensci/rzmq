@@ -19,7 +19,7 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
-#include "cppzmq.h"
+#include <zmq.hpp>
 #include "interface.h"
 
 SEXP get_zmq_version() {
