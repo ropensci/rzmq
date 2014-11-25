@@ -15,10 +15,16 @@
 ## along with this program.  If not, see <http:##www.gnu.org#licenses#>. ##
 ###########################################################################
 
-ZMQ_DONTWAIT <- 1
-
 zmq.version <- function() {
     .Call("get_zmq_version", PACKAGE="rzmq")
+}
+
+zmq.errno <- function() {
+    .Call("get_zmq_errno", PACKAGE="rzmq")
+}
+
+zmq.strerror <- function() {
+    .Call("get_zmq_strerror", PACKAGE="rzmq")
 }
 
 init.context <- function() {
@@ -53,15 +59,13 @@ receive.null.msg <- function(socket) {
     .Call("receiveNullMsg", socket, PACKAGE="rzmq")
 }
 
-receive.socket <- function(socket, unserialize=TRUE, flags=0) {
-  ans <- .Call("receiveSocket", socket, as.integer(flags), PACKAGE="rzmq")
+receive.socket <- function(socket, unserialize=TRUE,dont.wait=FALSE) {
+    ans <- .Call("receiveSocket", socket, dont.wait, PACKAGE="rzmq")
 
-  if (length(ans) == 1 && ans < 0) {
-    return (ans) # non-blocking requested and no message available.
-  } else if(unserialize) {
-    ans <- unserialize(ans)
-  }
-  ans
+    if(!is.null(ans) && unserialize) {
+        ans <- unserialize(ans)
+    }
+    ans
 }
 
 receive.multipart <- function(socket) {

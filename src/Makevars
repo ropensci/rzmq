@@ -1,1 +1,1 @@
-PKG_LIBS = -lzmq
+PKG_LIBS = -I. -lzmq

@@ -1,6 +1,8 @@
 useDynLib(rzmq)
 
 export(zmq.version,
+       zmq.errno,
+       zmq.strerror,
        init.context,
        init.socket,
        bind.socket,
@@ -34,6 +36,5 @@ export(zmq.version,
        set.reconnect.ivl.max,
        get.rcvmore,
        set.send.timeout,
-       get.send.timeout,
-       ZMQ_DONTWAIT
+       get.send.timeout
        )

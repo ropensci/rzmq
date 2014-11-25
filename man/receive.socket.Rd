@@ -5,26 +5,20 @@
 \alias{receive.int}
 \alias{receive.double}
 \title{
-Receive a message from the socket referenced by the socket argument .
+Receive a message from the socket referenced by the socket argument.
 }
 \description{
 The zmq_recv() function shall receive a message from the socket
 referenced by the socket argument. If there are no messages available
 on the specified socket, by default the function shall block until the request
 can be satisfied.
-A non-blocking receive can be obtained by passing the value ZMQ_DONTWAIT
-to the flags parameter. The following non-default flags are allowed:
-
-ZMQ_DONTWAIT(integer value 1):
-
-Specifies that the operation should be performed in
-           non-blocking mode. If there are no messages available on the
-           specified socket, the receive.socket() call will return -1
-           immediately.
+A non-blocking receive can be obtained by setting dont.wait to TRUE
+If there are no messages available on the specified socket, the
+receive.socket() call will return NULL immediately.
 
 }
 \usage{
-receive.socket(socket, unserialize=TRUE, flags=0)
+receive.socket(socket, unserialize=TRUE, dont.wait=FALSE)
 receive.null.msg(socket)
 receive.string(socket)
 receive.int(socket)
@@ -34,12 +28,13 @@ receive.double(socket)
 \arguments{
 \item{socket}{a zmq socket object}
 \item{unserialize}{whether to call unserialize on the received data}
-\item{flags}{defaults to 0, for blocking receive. Set to ZMQ_DONTWAIT for non-blocking receive.}
+\item{dont.wait}{defaults to false, for blocking receive. Set to TRUE for non-blocking receive.}
 }
 \value{
-  the value sent from the remote server or as.integer(-1 * errno) on failure.
-  If flags was ZMQ_DONTWAIT and a message was not immediately
-  available for receipt, the integer value returned is -11 or -1 * EAGAIN.
+  the value sent from the remote server or NULL on failure.
+  If dont.wait was TRUE and a message was not immediately
+  available for receipt, NULL is returned and get.zmq.errno() is set to 11
+  or get.zmq.strerror() is set to EAGAIN.
 }
 \references{
 http://www.zeromq.org

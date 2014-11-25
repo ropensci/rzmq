@@ -34,6 +34,20 @@ SEXP get_zmq_version() {
   return ans;
 }
 
+SEXP get_zmq_errno() {
+  SEXP ans; PROTECT(ans = allocVector(INTSXP,1));
+  INTEGER(ans)[0] = zmq_errno();
+  UNPROTECT(1);
+  return ans;
+}
+
+SEXP get_zmq_strerror() {
+  SEXP ans; PROTECT(ans = allocVector(STRSXP,1));
+  SET_STRING_ELT(ans, 0, mkChar(zmq_strerror(zmq_errno())));
+  UNPROTECT(1);
+  return ans;
+}
+
 int string_to_socket_type(const std::string s) {
   if(s == "ZMQ_PAIR") {
     return ZMQ_PAIR;
@@ -316,7 +330,6 @@ SEXP sendSocket(SEXP socket_, SEXP data_, SEXP send_more_) {
 
   bool send_more = LOGICAL(send_more_)[0];
   try {
-    errno = 0;
     if(send_more) {
       status = socket->send(msg,ZMQ_SNDMORE);
     } else {
@@ -376,39 +389,33 @@ SEXP receiveNullMsg(SEXP socket_) {
   return ans;
 }
 
-SEXP receiveSocket(SEXP socket_, SEXP flags_) {
+SEXP receiveSocket(SEXP socket_, SEXP dont_wait_) {
   SEXP ans;
   bool status(false);
   zmq::message_t msg;
-  int flags;
-  int nflag = length(flags_);
-  if (nflag < 1) {
-    flags = 0;
-  } else {
-    flags = INTEGER(flags_)[0];
+
+  if(TYPEOF(dont_wait_) != LGLSXP) {
+    REprintf("dont_wait type must be logical (LGLSXP).\n");
+    return R_NilValue;
   }
+  int flags = LOGICAL(dont_wait_)[0];
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
-  if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
+  if(!socket) { REprintf("bad socket object.\n"); return R_NilValue; }
   try {
-    errno = 0;
-    status = socket->recv(&msg, flags);
+    if(socket->recv(&msg, flags)) {
+      PROTECT(ans = allocVector(RAWSXP,msg.size()));
+      memcpy(RAW(ans),msg.data(),msg.size());
+      UNPROTECT(1);
+      return ans;
+    } else {
+      // socket->recv returned false, but did not throw
+      // this condition implies EAGAIN
+      // see here for logic: https://github.com/zeromq/cppzmq/blob/master/zmq.hpp#L449
+      return R_NilValue;
+    }
   } catch(std::exception& e) {
     REprintf("%s\n",e.what());
-    status = false;
   }
-
-  if(status) {
-    PROTECT(ans = allocVector(RAWSXP,msg.size()));
-    memcpy(RAW(ans),msg.data(),msg.size());
-    UNPROTECT(1);
-    return ans;
-  } else {
-    PROTECT(ans = allocVector(INTSXP,1));
-    INTEGER(ans)[0] = -errno;
-    UNPROTECT(1);
-    return ans;
-  }
-
   return R_NilValue;
 }
 

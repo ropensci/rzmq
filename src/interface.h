@@ -29,6 +29,8 @@ SEXP rzmq_unserialize(SEXP data, SEXP rho);
 
 extern "C" {
   SEXP get_zmq_version();
+  SEXP get_zmq_errno();
+  SEXP get_zmq_strerror();
   SEXP initContext();
   SEXP initSocket(SEXP context_, SEXP socket_type_);
   SEXP bindSocket(SEXP socket_, SEXP address_);

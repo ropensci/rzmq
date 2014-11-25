@@ -60,6 +60,15 @@
 #define ZMQ_NEW_MONITOR_EVENT_LAYOUT
 #endif
 
+#if ZMQ_VERSION >= ZMQ_MAKE_VERSION(4, 1, 0)
+#define ZMQ_HAS_PROXY_STEERABLE
+/*  Socket event data  */
+typedef struct {
+    uint16_t event;  // id of the event as bitfield
+    int32_t  value ; // value is either error code, fd or reconnect interval
+} zmq_event_t;
+#endif
+
 // In order to prevent unused variable warnings when building in non-debug
 // mode use this macro to make assertions.
 #ifndef NDEBUG
@@ -109,7 +118,16 @@ namespace zmq
         if (rc != 0)
             throw error_t ();
     }
-
+    
+#ifdef ZMQ_HAS_PROXY_STEERABLE
+    inline void proxy_steerable (void *frontend, void *backend, void *capture, void *control)
+    {
+        int rc = zmq_proxy_steerable (frontend, backend, capture, control);
+        if (rc != 0)
+            throw error_t ();
+    }
+#endif
+    
     inline void version (int *major_, int *minor_, int *patch_)
     {
         zmq_version (major_, minor_, patch_);
@@ -254,7 +272,7 @@ namespace zmq
         }
 
 
-        inline explicit context_t (int io_threads_, int max_sockets_ = 1024)
+        inline explicit context_t (int io_threads_, int max_sockets_ = ZMQ_MAX_SOCKETS_DFLT)
         {
             ptr = zmq_ctx_new ();
             if (ptr == NULL)
@@ -479,7 +497,15 @@ namespace zmq
                 if (rc == -1 && zmq_errno() == ETERM)
                     break;
                 assert (rc != -1);
-                zmq_event_t* event = static_cast<zmq_event_t*>(zmq_msg_data (&eventMsg));
+#if ZMQ_VERSION_MAJOR >= 4
+                const char* data = static_cast<const char*>(zmq_msg_data(&eventMsg));
+                zmq_event_t msgEvent;
+                msgEvent.event = *(uint16_t*)data; data += sizeof(uint16_t);
+                msgEvent.value = *(int32_t*)data;
+                zmq_event_t* event = &msgEvent;
+#else
+                zmq_event_t* event = static_cast<zmq_event_t*>(zmq_msg_data(&eventMsg));
+#endif
                 
 #ifdef ZMQ_NEW_MONITOR_EVENT_LAYOUT
                 zmq_msg_t addrMsg;
