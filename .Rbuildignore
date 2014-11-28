@@ -1,2 +1,3 @@
 ^\.git
 ^inst/cppzmq/\.git
+^README.rst$
