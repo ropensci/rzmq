@@ -1,10 +1,10 @@
 Package: rzmq
-Title: R binding for zmq (http://www.zeromq.org/)
+Title: R binding for zmq
 Version: 0.7.2
 Maintainer: Whit Armstrong <armstrong.whit@gmail.com>
 Author: Whit Armstrong <armstrong.whit@gmail.com>
 Description: R binding for zmq
 License: GPL-3
-SystemRequirements: libzmq, lippthread
+SystemRequirements: libzmq3, libzmq3-dev
 URL: http://github.com/armstrtw/rzmq
 BugReports: http://github.com/armstrtw/rzmq/issues
