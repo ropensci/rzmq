@@ -1,2 +1,2 @@
-PKG_CPPFLAGS += -I../inst/cppzmq
+PKG_CPPFLAGS = -I../inst/cppzmq
 PKG_LIBS = -lzmq
