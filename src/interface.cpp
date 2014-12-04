@@ -393,7 +393,6 @@ SEXP receiveNullMsg(SEXP socket_) {
 
 SEXP receiveSocket(SEXP socket_, SEXP dont_wait_) {
   SEXP ans;
-  bool status(false);
   zmq::message_t msg;
 
   if(TYPEOF(dont_wait_) != LGLSXP) {
