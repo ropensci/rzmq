@@ -5,6 +5,6 @@ Maintainer: Whit Armstrong <armstrong.whit@gmail.com>
 Author: Whit Armstrong <armstrong.whit@gmail.com>
 Description: Interface to the ZeroMQ lightweight messaging kernel (see <http://www.zeromq.org/> for more information).
 License: GPL-3
-SystemRequirements: ZeroMQ libraries and headers (see <http://www.zeromq.org/>; Debian packages libzmq3, libzmq3-devv, Fedora packages zeromq, zeromq-devel
+SystemRequirements: ZeroMQ libraries and headers (see <http://www.zeromq.org/>; Debian packages libzmq3, libzmq3-dev, Fedora packages zeromq, zeromq-devel)
 URL: http://github.com/armstrtw/rzmq
 BugReports: http://github.com/armstrtw/rzmq/issues
