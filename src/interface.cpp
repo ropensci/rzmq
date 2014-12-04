@@ -19,10 +19,10 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
+#include <zmq.h>
+static_assert(ZMQ_VERSION_MAJOR >= 3,"The minimum required version of libzmq is 3.0.0.");
 #include <zmq.hpp>
 #include "interface.h"
-
-static_assert(ZMQ_VERSION_MAJOR >= 3,"The minimum required version of libzmq is 3.0.0.");
 
 SEXP get_zmq_version() {
   SEXP ans;
