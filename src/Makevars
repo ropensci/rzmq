@@ -1,5 +1,6 @@
 ## -*- mode: makefile; -*-
 
 CXX_STD = CXX11
+PKG_CXXFLAGS = '-std=c++11'
 PKG_CPPFLAGS = -I../inst/cppzmq
 PKG_LIBS = -lzmq
