@@ -1,5 +1,6 @@
 \name{connect.socket}
 \alias{connect.socket}
+\alias{disconnect.socket}
 \title{
 Connect the socket referenced by the socket argument to the endpoint specified by the endpoint argument.
 }
@@ -22,6 +23,7 @@ With the exception of ZMQ_PAIR sockets, a single socket may be connected to mult
 }
 \usage{
 connect.socket(socket, address)
+disconnect.socket(socket, address)
 }
 
 \arguments{

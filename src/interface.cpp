@@ -299,7 +299,27 @@ SEXP connectSocket(SEXP socket_, SEXP address_) {
   }
   try {
     zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
-    socket->connect(CHAR(STRING_ELT(address_,0)));    
+    socket->connect(CHAR(STRING_ELT(address_,0)));
+  } catch(std::exception& e) {
+    REprintf("%s\n",e.what());
+    LOGICAL(ans)[0] = 0;
+  }
+
+  UNPROTECT(1);
+  return ans;
+}
+
+SEXP disconnectSocket(SEXP socket_, SEXP address_) {
+  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+
+  if(TYPEOF(address_) != STRSXP) {
+    REprintf("address type must be a string.\n");
+    UNPROTECT(1);
+    return R_NilValue;
+  }
+  try {
+    zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
+    socket->disconnect(CHAR(STRING_ELT(address_,0)));
   } catch(std::exception& e) {
     REprintf("%s\n",e.what());
     LOGICAL(ans)[0] = 0;
