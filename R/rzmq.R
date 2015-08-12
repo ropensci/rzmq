@@ -44,7 +44,7 @@ connect.socket <- function(socket, address) {
 }
 
 disconnect.socket <- function(socket, address) {
-    invisible(.Call("connectSocket", socket, address, PACKAGE="rzmq"))
+    invisible(.Call("disconnectSocket", socket, address, PACKAGE="rzmq"))
 }
 
 send.socket <- function(socket, data, send.more=FALSE, serialize=TRUE) {
