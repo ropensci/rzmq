@@ -120,7 +120,13 @@ static void socketFinalizer(SEXP socket_) {
 
 SEXP initContext() {
   SEXP context_;
-  zmq::context_t* context = new zmq::context_t(1);
+  try {
+    zmq::context_t* context = new zmq::context_t(1);
+  } catch(std::exception& e) {
+    REprintf("%s\n",e.what());
+    return R_NilValue;
+  }
+
   if(context) {
     PROTECT(context_ = R_MakeExternalPtr(reinterpret_cast<void*>(context),install("zmq::context_t*"),R_NilValue));
     R_RegisterCFinalizerEx(context_, contextFinalizer, TRUE);
