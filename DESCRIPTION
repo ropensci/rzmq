@@ -1,6 +1,6 @@
 Package: rzmq
 Title: R Bindings for ZeroMQ
-Version: 0.7.9
+Version: 0.8.0
 Maintainer: Whit Armstrong <armstrong.whit@gmail.com>
 Author: Whit Armstrong <armstrong.whit@gmail.com>
 Description: Interface to the ZeroMQ lightweight messaging kernel (see <http://www.zeromq.org/> for more information).
