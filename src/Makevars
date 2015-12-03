@@ -1,5 +1,5 @@
 ## -*- mode: makefile; -*-
 
 CXX_STD = CXX11
-PKG_CPPFLAGS = -I../inst
-PKG_LIBS = -lzmq
+PKG_CPPFLAGS = -I../inst $(shell pkg-config --cflags libzmq)
+PKG_LIBS = $(shell pkg-config --libs libzmq)
