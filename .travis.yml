@@ -1,0 +1,9 @@
+language: r
+sudo: required
+
+# Be strict when checking the package
+warnings_are_errors: true
+
+# System dependencies for HTTP calling
+apt_packages:
+ - libzmq3-dev
