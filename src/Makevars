@@ -1,5 +1,13 @@
 ## -*- mode: makefile; -*-
 
 CXX_STD = CXX11
+
+ifeq (,$(shell which pkg-config))
+# if the pkg-config program isn't found
 PKG_CPPFLAGS = -I../inst
 PKG_LIBS = -lzmq
+else
+# if the pkg-config program is found
+PKG_CPPFLAGS = -I../inst $(shell pkg-config --cflags libzmq)
+PKG_LIBS = $(shell pkg-config --libs libzmq)
+endif
