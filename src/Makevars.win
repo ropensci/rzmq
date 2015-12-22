@@ -1,0 +1,5 @@
+## -*- mode: makefile; -*-
+
+CXX_STD = CXX11
+PKG_CPPFLAGS = -I../inst/cppzmq -I./win -DZMQ_STATIC
+PKG_LIBS = -L./win$(R_ARCH) -lzmq -lws2_32
