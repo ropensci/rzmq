@@ -10,7 +10,7 @@ r:
   - devel
 
 os:
-  - linux
+  #- linux
   - osx
 
 r_github_packages: snoweye/pbdZMQ
