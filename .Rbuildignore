@@ -1,3 +1,4 @@
 ^\.git
 ^inst/cppzmq/\.git
 ^README.rst$
+^\.travis\.yml$

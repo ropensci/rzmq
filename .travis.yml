@@ -19,7 +19,7 @@ before_install:
 r_github_packages: snoweye/pbdZMQ
 
 install:
-  - ./travis-tool.sh install_deps
+  #- ./travis-tool.sh install_deps
 
 script: ./travis-tool.sh run_tests
 
