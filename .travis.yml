@@ -2,7 +2,7 @@
 #
 # See README.md for instructions, or for more configuration options,
 # see the wiki:
-#   https://github.com/craigcitro/r-travis/wiki
+#   https://docs.travis-ci.com/user/languages/r/
 
 language: r
 
