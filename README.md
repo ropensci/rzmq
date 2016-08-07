@@ -6,6 +6,7 @@ Introduction
 * **Contact:** armstrong.whit@gmail.com
 * **Web site:** http://github.com/armstrtw/rzmq
 * **License:** GPL-3
+* **Status:** [![Build Status](https://travis-ci.org/snoweye/rzmq.png)](https://travis-ci.org/snoweye/rzmq)
 
 
 Purpose
