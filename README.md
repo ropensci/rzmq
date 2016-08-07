@@ -1,12 +1,12 @@
-************
 Introduction
-************
+=======
 
-:Date: Sept 27, 2011
-:Authors: Whit Armstrong
-:Contact: armstrong.whit@gmail.com
-:Web site: http://github.com/armstrtw/rzmq
-:License: GPL-3
+* **Date:** Sept 27, 2011
+* **Authors:** Whit Armstrong
+* **Contact:** armstrong.whit@gmail.com
+* **Web site:** http://github.com/armstrtw/rzmq
+* **License:** GPL-3
+* **Status:** [![Build Status](https://travis-ci.org/snoweye/rzmq.png)](https://travis-ci.org/snoweye/rzmq)
 
 
 Purpose

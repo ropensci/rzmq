@@ -1,0 +1,19 @@
+## -*- mode: makefile; -*-
+
+CXX_STD = CXX11
+# PKG_CPPFLAGS = -I../inst
+# PKG_LIBS = -lzmq
+PKG_CPPFLAGS = @ZMQ_CPPFLAGS@ -I../inst
+PKG_LIBS = @ZMQ_LDFLAGS@
+
+### Setup R source code and objects.
+R_OBJS = interface.o 
+OBJECTS = $(R_OBJS)
+
+all: $(SHLIB)
+
+$(SHLIB): $(OBJECTS)
+
+clean:
+	@$(RM) -rf *.o *.d *.rc *.so* *.dll *.dylib *.a *.lib *.la \
+	           Makedeps Makevars Makeconf $(SHLIB) $(OBJECTS)

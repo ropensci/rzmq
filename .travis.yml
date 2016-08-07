@@ -1,0 +1,18 @@
+# Sample .travis.yml for R projects.
+#
+# See README.md for instructions, or for more configuration options,
+# see the wiki:
+#   https://docs.travis-ci.com/user/languages/r/
+
+language: r
+
+r:
+  - devel
+
+os:
+  - linux
+  - osx
+
+r_github_packages: snoweye/pbdZMQ
+
+sudo: required

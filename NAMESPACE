@@ -39,3 +39,5 @@ export(zmq.version,
        set.send.timeout,
        get.send.timeout
        )
+
+import("pbdZMQ")

@@ -1,0 +1,45 @@
+## -*- mode: makefile; -*-
+
+CXX_STD = CXX11
+# PKG_CPPFLAGS = -I../inst
+# PKG_LIBS = -lzmq
+
+### Rscript
+R_SCMD = ${R_HOME}/bin${R_ARCH_BIN}/Rscript -e
+
+### Get GNU_ROOT from PATH.
+MINGW_LIB = $(shell ${R_SCMD} \
+  "pbdZMQ:::get.mingw.lib('"${R_ARCH}"','"${BINPREF}"')")
+STDCXX_LIB = $(shell ${R_SCMD} \
+  "pbdZMQ:::get.stdcxx.lib('"${R_ARCH}"','"${BINPREF}"')")
+ZMQ_CPPFLAGS = $(shell ${R_SCMD} \
+  "pbdZMQ:::get.zmq.cppflags('"${R_ARCH}"')")
+ZMQ_LDFLAGS = $(shell ${R_SCMD} \
+  "pbdZMQ:::get.zmq.ldflags('"${R_ARCH}"')")
+
+### R package stuffs.
+PKG_CPPFLAGS = ${ZMQ_CPPFLAGS} -I../inst
+
+### Order is matter.
+ifeq "$(WIN)" "64"
+PKG_LIBS_ZMQ = -L"$(MINGW_LIB)" -liphlpapi -lrpcrt4 -lws2_32 \
+               -L"$(STDCXX_LIB)" -lstdc++ -lpthread
+else
+PKG_LIBS_ZMQ = -L"$(MINGW_LIB)" -liphlpapi -lrpcrt4 -lws2_32 \
+               -L"$(STDCXX_LIB)" -lstdc++
+endif
+PKG_LIBS = ${ZMQ_LDFLAGS} ${PKG_LIBS_ZMQ}
+
+### Setup R source code and objects.
+R_SRCS_CXX = $(wildcard *.cpp)
+R_OBJS = $(R_SRCS_CXX:.cpp=.o)
+OBJECTS = $(R_OBJS)
+
+all: $(SHLIB)
+
+$(SHLIB): $(OBJECTS)
+
+clean:
+	@$(RM) -rf *.o *.d *.rc *.so* *.dll *.dylib *.a *.lib *.la \
+	           Makedeps Makevars Makeconf $(SHLIB) $(OBJECTS)
+
