@@ -31,7 +31,7 @@ if(length(files) > 0){
         print(rpath)
 
 	id <- grep("libzmq.4.dylib", rpath)
-        org <- gsub("\\t(.*) \(.*\)", "\\1", rpath[id])
+        org <- gsub("\\t(.*) \\(.*\\)", "\\1", rpath[id])
         cmd <- paste(cmd.int, " -change ", org, " ", fn.libzmq.4.dylib, " ",
                      fn.rzmq.so, sep = "")
         cat("\nIn install_name_tool:\n")
