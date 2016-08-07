@@ -17,7 +17,7 @@ if(length(files) > 0){
 
     zmq.ldflags <- pbdZMQ:::get.zmq.ldflags()
     dest.zmq <- gsub("-L(.*) -l.*", "\\1", zmq.ldflags)
-    fn.libzmq.4.dylib <- file.path(dest.zmq, "/libzmq.4.dylib")
+    fn.libzmq.4.dylib <- file.path(dest.zmq, "libzmq.4.dylib")
 
     if(length(grep("install_name_tool", cmd.int)) > 0 &&
        file.exists(fn.rzmq.so) &&
@@ -29,16 +29,15 @@ if(length(files) > 0){
                         intern = TRUE)
         cat("\nBefore install_name_tool:\n")
         print(rpath)
-      }
 
-      org <- file.path(getwd(), "zmq/lib/libzmq.4.dylib")
-      cmd <- paste(cmd.int, " -change ", org, " ", fn.libzmq.4.dylib, " ",
-                   fn.rzmq.so, sep = "")
-      cat("\nIn install_name_tool:\n")
-      print(cmd) 
-      system(cmd)
+	id <- grep("libzmq.4.dylib", rpath)
+        org <- gsub("\\t(.*) \(.*\)", "\\1", rpath[id])
+        cmd <- paste(cmd.int, " -change ", org, " ", fn.libzmq.4.dylib, " ",
+                     fn.rzmq.so, sep = "")
+        cat("\nIn install_name_tool:\n")
+        print(cmd) 
+        system(cmd)
 
-      if(length(grep("otool", cmd.ot)) > 0){
         rpath <- system(paste(cmd.ot, " -L ", fn.rzmq.so, sep = ""),
                         intern = TRUE)
         cat("\nAfter install_name_tool:\n")
