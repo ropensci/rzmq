@@ -1,3 +1,7 @@
 ^\.git
 ^inst/cppzmq/\.git
 ^README.rst$
+^.*\.Rproj$
+^\.Rproj\.user$
+^src/Makevars$
+^.travis.yml$
