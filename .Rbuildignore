@@ -6,3 +6,4 @@
 ^src/Makevars$
 ^.travis.yml$
 ^windows$
+^appveyor\.yml$
