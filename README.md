@@ -13,7 +13,44 @@ rzmq is a message queue for serialized R objects.
 * ZMQ devices are not implemented yet, nor is zmq_poll.
 * Look for more features shortly.
 
+### Installation
+
+Binary packages for __OS-X__ or __Windows__ can be installed directly from CRAN:
+
+```r
+install.packages("rzmq")
+```
+
+#### Build from source
+
+Installation from source requires [`ZeroMQ`](http://zeromq.org/area:download). On __Debian__ or __Ubuntu__ use [libzmq3-dev](https://packages.debian.org/testing/libzmq3-dev):
+
+```
+sudo apt-get install -y libzmq3-dev
+```
+
+On __Fedora__ we need [zeromq3-devel](https://apps.fedoraproject.org/packages/zeromq3-devel):
+
+```
+sudo yum install zeromq3-devel
+````
+
+On __CentOS / RHEL__ we install [zeromq3-devel](https://apps.fedoraproject.org/packages/zeromq3-devel) via EPEL:
+
+```
+sudo yum install epel-release
+sudo yum install zeromq3-devel
+```
+
+On __OS-X__ use [zeromq](https://github.com/Homebrew/homebrew-core/blob/master/Formula/zeromq.rb) from Homebrew:
+
+```
+brew install zeromq
+```
+
+
 ### Usage
+
 A minimal example of remote execution.
 
 execute this R script on the remote server:
