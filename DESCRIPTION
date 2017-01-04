@@ -1,8 +1,9 @@
 Package: rzmq
 Title: R Bindings for ZeroMQ
 Version: 0.8.0
-Maintainer: Whit Armstrong <armstrong.whit@gmail.com>
-Author: Whit Armstrong <armstrong.whit@gmail.com>
+Authors@R: c(
+    person("Whit", "Armstrong", , "armstrong.whit@gmail.com", role = c("aut", "cre")),
+    person("Jeroen", "Ooms", , "jeroen.ooms@stat.ucla.edu", role = "aut"))
 Description: Interface to the ZeroMQ lightweight messaging kernel (see <http://www.zeromq.org/> for more information).
 License: GPL-3
 Depends: R (>= 3.1.0)
