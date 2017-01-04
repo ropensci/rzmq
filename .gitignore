@@ -4,5 +4,7 @@
 *.rc
 *.o
 *.so
+*.dll
 .Rproj.user
 src/Makevars
+windows

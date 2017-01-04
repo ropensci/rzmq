@@ -1,0 +1,20 @@
+CXX_STD = CXX11
+COMPILED_BY ?= gcc-4.6.3
+GCC_VERSION = ${subst gcc,,${COMPILED_BY}}
+ZEROMQ = ../windows/zeromq-4.2.1
+
+PKG_CPPFLAGS = -DZMQ_STATIC \
+	-I${ZEROMQ}/include -I../inst
+	
+PKG_LIBS = \
+	-L${ZEROMQ}/lib${R_ARCH} \
+	-L${ZEROMQ}/lib${GCC_VERSION}${R_ARCH} \
+	-lzmq -lsodium -liphlpapi -lws2_32
+
+all: clean winlibs
+
+clean:
+	rm -f $(OBJECTS) $(SHLIB)
+
+winlibs:
+	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" --vanilla "../tools/winlibs.R"

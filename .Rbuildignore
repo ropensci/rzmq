@@ -5,3 +5,4 @@
 ^\.Rproj\.user$
 ^src/Makevars$
 ^.travis.yml$
+^windows$
