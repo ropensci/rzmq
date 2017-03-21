@@ -2,11 +2,11 @@ Package: rzmq
 Title: R Bindings for ZeroMQ
 Version: 0.9.1
 Authors@R: c(
-    person("Whit", "Armstrong", , "armstrong.whit@gmail.com", role = c("aut", "cre")),
-    person("Jeroen", "Ooms", , "jeroen@berkeley.edu", role = "aut"))
-Description: Interface to the ZeroMQ lightweight messaging kernel (see <http://www.zeromq.org/> for more information).
+    person("Whit", "Armstrong", , "armstrong.whit@gmail.com", role = "aut"),
+    person("Jeroen", "Ooms", , "jeroen@berkeley.edu", role = c("aut", "cre")))
+Description: Interface to the 'ZeroMQ' lightweight messaging kernel (see <http://www.zeromq.org/> for more information).
 License: GPL-3
 Depends: R (>= 3.1.0)
 SystemRequirements: ZeroMQ >= 3.0.0 libraries and headers (see <http://www.zeromq.org/>; Debian packages libzmq3, libzmq3-dev, Fedora packages zeromq3, zeromq3-devel)
-URL: http://github.com/armstrtw/rzmq
-BugReports: http://github.com/armstrtw/rzmq/issues
+URL: http://github.com/ropensci/rzmq
+BugReports: http://github.com/ropensci/rzmq/issues
