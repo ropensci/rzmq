@@ -73,6 +73,10 @@ int string_to_socket_type(const std::string s) {
     return ZMQ_XPUB;
   } else if(s == "ZMQ_XSUB") {
     return ZMQ_XSUB;
+  } else if(s == "ZMQ_XREQ") {
+    return ZMQ_XREQ;
+  } else if(s == "ZMQ_XREP") {
+    return ZMQ_XREP;
   } else {
     return -1;
   }
