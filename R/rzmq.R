@@ -105,7 +105,7 @@ receive.double <- function(socket) {
 }
 
 poll.socket <- function(sockets, events, timeout=0L) {
-    if (timeout != -1L) timeout <- as.integer(timeout * 1000000)
+    if (timeout != -1L) timeout <- as.integer(timeout * 1e3)
     .Call("pollSocket", sockets, events, timeout)
 }
 
