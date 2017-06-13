@@ -73,10 +73,6 @@ int string_to_socket_type(const std::string s) {
     return ZMQ_XPUB;
   } else if(s == "ZMQ_XSUB") {
     return ZMQ_XSUB;
-  } else if(s == "ZMQ_XREQ") {
-    return ZMQ_XREQ;
-  } else if(s == "ZMQ_XREP") {
-    return ZMQ_XREP;
   } else {
     return -1;
   }
@@ -119,26 +115,6 @@ static void socketFinalizer(SEXP socket_) {
   if(socket) {
     delete socket;
     R_ClearExternalPtr(socket_);
-  }
-}
-
-SEXP initContext() {
-  SEXP context_;
-  zmq::context_t* context;
-  try {
-    context = new zmq::context_t(1);
-  } catch(std::exception& e) {
-    REprintf("%s\n",e.what());
-    return R_NilValue;
-  }
-
-  if(context) {
-    PROTECT(context_ = R_MakeExternalPtr(reinterpret_cast<void*>(context),install("zmq::context_t*"),R_NilValue));
-    R_RegisterCFinalizerEx(context_, contextFinalizer, TRUE);
-    UNPROTECT(1);
-    return context_;
-  } else {
-    return R_NilValue;
   }
 }
 
@@ -974,3 +950,246 @@ SEXP rzmq_unserialize(SEXP data, SEXP rho) {
   UNPROTECT(2);
   return ans;
 }
+
+/////////////////////////////////////////////////////////////////////////////////
+// BDD functions                                                               //
+/////////////////////////////////////////////////////////////////////////////////
+
+#include <iostream>
+
+// keys are 40-byte strings plus one for null terminating character
+#define KEY_SIZE 41
+
+SEXP closeSocket( SEXP socket_ ){
+  
+  SEXP ans;
+  PROTECT( ans = allocVector( LGLSXP,1 ) );
+  LOGICAL( ans )[0] = 1;
+
+  try{
+    zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>( checkExternalPointer( socket_, "zmq::socket_t*" )  );
+    socket->close();
+  }catch( std::exception& e ){
+    REprintf( "%s\n", e.what() );
+    LOGICAL( ans )[0] = 0;
+  }
+  
+  UNPROTECT( 1 );
+  return ans;
+}
+
+/////////////////
+
+SEXP get_keypair(){
+  
+  SEXP vec;
+  PROTECT( vec = allocVector( VECSXP, 2 ) );
+  
+  try{
+    
+    char *public_key = (char*)malloc( KEY_SIZE );
+    char *secret_key = (char*)malloc( KEY_SIZE );
+    
+    // Create secret and public keys
+    // Signature: int zmq_curve_keypair (char *z85_public_key, char *z85_secret_key)
+    zmq_curve_keypair( public_key, secret_key );
+
+    // Populate vector with public and secret keys
+    SET_VECTOR_ELT( vec, 0, mkString( public_key ) );
+    SET_VECTOR_ELT( vec, 1, mkString( secret_key ) );
+    
+  }catch( std::exception& e ){
+    REprintf("%s\n",e.what());
+  }
+  
+  UNPROTECT( 1 );
+  return vec;
+}
+
+//////////////
+
+SEXP set_curve_server( SEXP socket_ ){
+  
+  SEXP ans;
+  PROTECT( ans = allocVector( INTSXP, 1 ) );
+  INTEGER( ans )[0] = 0;
+
+  try{
+    
+    // Cast function parameters from SEXP to required C data type
+    zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>( checkExternalPointer( socket_, "zmq::socket_t*" ) );
+ 
+    if( !socket ){
+      REprintf( "bad socket object.\n" );
+      return R_NilValue;
+    }
+
+    // Set ZMQ_CURVE_SERVER option for socket to 1 (only called wfor server socket)
+    int option_value = 1;
+    socket->setsockopt( ZMQ_CURVE_SERVER, &option_value, sizeof( int ) );
+  
+  }catch( std::exception& e ){
+    REprintf( "%s\n", e.what() );
+    LOGICAL( ans )[0] = -1;
+  }
+  
+  UNPROTECT(1);
+  return ans;
+}
+
+////////////////////////////////
+
+SEXP get_curve_server( SEXP socket_ ){
+  
+  SEXP ans;
+  PROTECT( ans = allocVector( INTSXP, 1 ) );
+
+  try{
+    // Cast function parameters from SEXP to required C data type
+    zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>( checkExternalPointer( socket_, "zmq::socket_t*" ) );
+
+    int option_value = -1;
+    size_t option_len = sizeof( int );
+    
+    socket->getsockopt( ZMQ_CURVE_SERVER, &option_value, &option_len );
+  
+    // Populate ans with value of ZMQ_CURVE_SERVER
+    INTEGER( ans )[0] = option_value;
+
+  }catch( std::exception& e ){
+    REprintf( "%s\n", e.what() );
+  }
+  
+  UNPROTECT(1);
+  return ans;
+}
+
+
+//////////////////////////
+
+SEXP set_key( SEXP socket_, SEXP key_type_, SEXP option_value_ ){
+  
+  SEXP ans;
+  PROTECT( ans = allocVector( LGLSXP, 1 ) );
+  LOGICAL( ans )[0] = 0;
+
+  try{
+    // Cast function parameters from SEXP to required C data type
+    zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>( checkExternalPointer( socket_, "zmq::socket_t*" ) );
+
+    if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
+    
+    // Cast option_value_ to const char* pointer
+    const char* option_value = CHAR( STRING_ELT( option_value_, 0 ) );
+    const char* key_type_char = CHAR( STRING_ELT( key_type_, 0 ) );
+
+    if( std::strcmp( key_type_char, "PUBLIC" ) == 0){
+      socket->setsockopt( ZMQ_CURVE_PUBLICKEY, option_value, KEY_SIZE );
+
+    }else if( std::strcmp( key_type_char, "SECRET" ) == 0 ){
+      socket->setsockopt( ZMQ_CURVE_SECRETKEY, option_value, KEY_SIZE );
+      
+    }else if( std::strcmp( key_type_char, "SERVER" ) == 0 ){
+      socket->setsockopt( ZMQ_CURVE_SERVERKEY, option_value, KEY_SIZE );
+      
+    }
+    
+  }catch( std::exception& e ){
+    REprintf( "%s\n", e.what() );
+    LOGICAL( ans )[0] = 1;  }
+  
+  UNPROTECT(1);
+  return ans;
+}
+
+////////////////////////////////
+
+SEXP get_key( SEXP socket_, SEXP key_type_ ){
+  
+  SEXP ans;
+  PROTECT( ans = allocVector( STRSXP, 1 ) );
+
+  try{
+    // Cast function parameters from SEXP to required C data type
+    zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>( checkExternalPointer( socket_, "zmq::socket_t*" ) );
+
+    if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
+    
+    char* option_value = (char*)malloc( KEY_SIZE );
+    size_t option_len = KEY_SIZE;
+
+
+    const char* key_type_char = CHAR( STRING_ELT( key_type_, 0 ) );
+
+    if( std::strcmp( key_type_char, "PUBLIC" ) == 0 ){
+      socket->getsockopt( ZMQ_CURVE_PUBLICKEY, option_value, &option_len );
+      
+    }else if( std::strcmp( key_type_char, "SECRET" ) == 0 ){
+      socket->getsockopt( ZMQ_CURVE_SECRETKEY, option_value, &option_len );
+      
+    }else if( std::strcmp( key_type_char, "SERVER" ) == 0 ){
+      socket->getsockopt( ZMQ_CURVE_SERVERKEY, option_value, &option_len );
+      
+    }
+    
+    // Populate ans with value of option_value
+    SET_STRING_ELT( ans, 0, mkChar( option_value ) ); 
+    
+  }catch( std::exception& e ){
+    REprintf( "%s\n", e.what() );
+  }
+  
+  UNPROTECT(1);
+  return ans;
+}
+
+////////////////
+
+SEXP initContext( SEXP io_threads_ ){
+  SEXP context_;
+  zmq::context_t* context;
+
+  try {
+    context = new zmq::context_t( asReal( io_threads_ ) );
+    
+  } catch(std::exception& e) {
+    REprintf("%s\n",e.what());
+    return R_NilValue;
+  }
+
+  if(context) {
+    PROTECT(context_ = R_MakeExternalPtr(reinterpret_cast<void*>(context),install("zmq::context_t*"),R_NilValue));
+    R_RegisterCFinalizerEx(context_, contextFinalizer, TRUE);
+    UNPROTECT(1);
+    return context_;
+  } else {
+    return R_NilValue;
+  }
+}
+
+////////////
+
+SEXP get_io_threads( SEXP context_ ){
+  
+  SEXP io_threads_;
+  PROTECT( io_threads_ = allocVector( INTSXP, 1 ) );
+
+  try{
+    
+    zmq::context_t* context = reinterpret_cast<zmq::context_t*>( R_ExternalPtrAddr( context_ ) );
+    void* context_ptr = context->get_ptr();
+    int io_threads = zmq_ctx_get( context_ptr, ZMQ_IO_THREADS );
+
+    // Populate vector with number of io_threads
+    INTEGER( io_threads_ )[0] = io_threads;
+    
+  }catch( std::exception& e ){
+    REprintf("%s\n",e.what());
+  }
+  
+  UNPROTECT( 1 );
+  
+  return io_threads_;
+}
+
+// END OF FILE

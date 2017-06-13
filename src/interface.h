@@ -31,7 +31,6 @@ extern "C" {
   SEXP get_zmq_version();
   SEXP get_zmq_errno();
   SEXP get_zmq_strerror();
-  SEXP initContext();
   SEXP initSocket(SEXP context_, SEXP socket_type_);
   SEXP bindSocket(SEXP socket_, SEXP address_);
   SEXP connectSocket(SEXP socket_, SEXP address_);
@@ -64,6 +63,24 @@ extern "C" {
   SEXP pollSocket(SEXP socket_, SEXP events_, SEXP timeout_);
   SEXP get_sndtimeo(SEXP socket_);
   SEXP set_sndtimeo(SEXP socket_, SEXP option_value_);
+
+  ///////////////////////////////////////////////////////////////////////////////
+  // BDD functions                                                             //
+  ///////////////////////////////////////////////////////////////////////////////
+
+  SEXP closeSocket( SEXP socket_ );
+
+  SEXP get_keypair();
+  
+  SEXP set_curve_server( SEXP socket_ );
+  SEXP get_curve_server( SEXP socket_ );
+ 
+  SEXP set_key( SEXP socket_, SEXP key_type_, SEXP option_value_ );
+  SEXP get_key( SEXP socket_, SEXP key_type_ );
+
+  SEXP initContext( SEXP io_threads_ );
+
+  SEXP get_io_threads( SEXP context_ );
 }
 
 #endif // INTERFACE_HPP

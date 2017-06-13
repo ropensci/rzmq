@@ -396,6 +396,11 @@ namespace zmq
         {
             return ptr;
         }
+
+      void* get_ptr(){
+        return ptr;
+      }
+      
     private:
 
         void *ptr;

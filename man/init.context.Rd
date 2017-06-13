@@ -8,11 +8,12 @@
   initailize zmq context and zmq socket for to be used for further zmq operations.
 }
 \usage{
-init.context()
+init.context(io_threads)
 init.socket(context, socket.type)
 }
 
 \arguments{
+  \item{io_threads}{(optional) The number of io_threads to use. Defaults to 1.}
   \item{context}{returns a zmq context object.}
   \item{socket.type}{ The ZMQ socket type requested
     e.g. ZMQ_REQ,ZMQ_REP,ZMQ_PULL,ZMQ_PUSH, etc.}
