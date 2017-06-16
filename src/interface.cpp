@@ -955,10 +955,33 @@ SEXP rzmq_unserialize(SEXP data, SEXP rho) {
 // BDD functions                                                               //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
+//#include <iostream>
 
-// keys are 40-byte strings plus one for null terminating character
-#define KEY_SIZE 41
+/////
+
+SEXP initContext( SEXP io_threads_ ){
+  SEXP context_;
+  zmq::context_t* context;
+
+  try {
+    context = new zmq::context_t( asReal( io_threads_ ) );
+    
+  } catch(std::exception& e) {
+    REprintf("%s\n",e.what());
+    return R_NilValue;
+  }
+
+  if(context) {
+    PROTECT(context_ = R_MakeExternalPtr(reinterpret_cast<void*>(context),install("zmq::context_t*"),R_NilValue));
+    R_RegisterCFinalizerEx(context_, contextFinalizer, TRUE);
+    UNPROTECT(1);
+    return context_;
+  } else {
+    return R_NilValue;
+  }
+}
+
+/////
 
 SEXP closeSocket( SEXP socket_ ){
   
@@ -979,6 +1002,13 @@ SEXP closeSocket( SEXP socket_ ){
 }
 
 /////////////////
+
+
+#if ZMQ_VERSION_MAJOR >= 4
+
+// keys are 40-byte strings plus one for null terminating character
+#define KEY_SIZE 41
+
 
 SEXP get_keypair(){
   
@@ -1145,30 +1175,6 @@ SEXP get_key( SEXP socket_, SEXP key_type_ ){
 
 ////////////////
 
-SEXP initContext( SEXP io_threads_ ){
-  SEXP context_;
-  zmq::context_t* context;
-
-  try {
-    context = new zmq::context_t( asReal( io_threads_ ) );
-    
-  } catch(std::exception& e) {
-    REprintf("%s\n",e.what());
-    return R_NilValue;
-  }
-
-  if(context) {
-    PROTECT(context_ = R_MakeExternalPtr(reinterpret_cast<void*>(context),install("zmq::context_t*"),R_NilValue));
-    R_RegisterCFinalizerEx(context_, contextFinalizer, TRUE);
-    UNPROTECT(1);
-    return context_;
-  } else {
-    return R_NilValue;
-  }
-}
-
-////////////
-
 SEXP get_io_threads( SEXP context_ ){
   
   SEXP io_threads_;
@@ -1191,5 +1197,7 @@ SEXP get_io_threads( SEXP context_ ){
   
   return io_threads_;
 }
+
+#endif
 
 // END OF FILE
