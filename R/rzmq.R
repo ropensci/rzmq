@@ -16,27 +16,27 @@
 ###########################################################################
 
 zmq.errno <- function() {
-    .Call("get_zmq_errno", PACKAGE="rzmq2")
+    .Call("get_zmq_errno", PACKAGE="rzmq")
 }
 
 zmq.strerror <- function() {
-    .Call("get_zmq_strerror", PACKAGE="rzmq2")
+    .Call("get_zmq_strerror", PACKAGE="rzmq")
 }
 
 init.socket <- function(context, socket.type) {
-    .Call("initSocket", context, socket.type, PACKAGE="rzmq2")
+    .Call("initSocket", context, socket.type, PACKAGE="rzmq")
 }
 
 bind.socket <- function(socket, address) {
-    invisible(.Call("bindSocket", socket, address, PACKAGE="rzmq2"))
+    invisible(.Call("bindSocket", socket, address, PACKAGE="rzmq"))
 }
 
 connect.socket <- function(socket, address) {
-    invisible(.Call("connectSocket", socket, address, PACKAGE="rzmq2"))
+    invisible(.Call("connectSocket", socket, address, PACKAGE="rzmq"))
 }
 
 disconnect.socket <- function(socket, address) {
-    invisible(.Call("disconnectSocket", socket, address, PACKAGE="rzmq2"))
+    invisible(.Call("disconnectSocket", socket, address, PACKAGE="rzmq"))
 }
 
 send.socket <- function(socket, data, send.more=FALSE, serialize=TRUE,
@@ -45,19 +45,19 @@ send.socket <- function(socket, data, send.more=FALSE, serialize=TRUE,
         data <- serialize(data, NULL, xdr=xdr)
     }
 
-    invisible(.Call("sendSocket", socket, data, send.more, PACKAGE="rzmq2"))
+    invisible(.Call("sendSocket", socket, data, send.more, PACKAGE="rzmq"))
 }
 
 send.null.msg <- function(socket, send.more=FALSE) {
-    .Call("sendNullMsg", socket, send.more, PACKAGE="rzmq2")
+    .Call("sendNullMsg", socket, send.more, PACKAGE="rzmq")
 }
 
 receive.null.msg <- function(socket) {
-    .Call("receiveNullMsg", socket, PACKAGE="rzmq2")
+    .Call("receiveNullMsg", socket, PACKAGE="rzmq")
 }
 
 receive.socket <- function(socket, unserialize=TRUE,dont.wait=FALSE) {
-    ans <- .Call("receiveSocket", socket, dont.wait, PACKAGE="rzmq2")
+    ans <- .Call("receiveSocket", socket, dont.wait, PACKAGE="rzmq")
 
     if(!is.null(ans) && unserialize) {
         ans <- unserialize(ans)
@@ -81,19 +81,19 @@ send.multipart <- function(socket, parts) {
 }
 
 send.raw.string <- function(socket,data,send.more=FALSE) {
-    .Call("sendRawString", socket, data, send.more, PACKAGE="rzmq2")
+    .Call("sendRawString", socket, data, send.more, PACKAGE="rzmq")
 }
 
 receive.string <- function(socket) {
-    .Call("receiveString", socket, PACKAGE="rzmq2")
+    .Call("receiveString", socket, PACKAGE="rzmq")
 }
 
 receive.int <- function(socket) {
-    .Call("receiveInt", socket, PACKAGE="rzmq2")
+    .Call("receiveInt", socket, PACKAGE="rzmq")
 }
 
 receive.double <- function(socket) {
-    .Call("receiveDouble", socket, PACKAGE="rzmq2")
+    .Call("receiveDouble", socket, PACKAGE="rzmq")
 }
 
 poll.socket <- function(sockets, events, timeout=0L) {
@@ -105,7 +105,7 @@ set.hwm <- function(socket, option.value) {
     if(zmq.version() >= "3.0.0") {
         stop("ZMQ_HWM removed from libzmq3")
     } else {
-        .Call("set_hwm",socket, option.value, PACKAGE="rzmq2")
+        .Call("set_hwm",socket, option.value, PACKAGE="rzmq")
     }
 }
 
@@ -113,39 +113,39 @@ set.swap <- function(socket, option.value) {
     if(zmq.version() >= "3.0.0") {
         stop("ZMQ_SWAP removed from libzmq3")
     } else {
-        .Call("set_swap",socket, option.value, PACKAGE="rzmq2")
+        .Call("set_swap",socket, option.value, PACKAGE="rzmq")
     }
 }
 
 set.affinity <- function(socket, option.value) {
-    .Call("set_affinity",socket, option.value, PACKAGE="rzmq2")
+    .Call("set_affinity",socket, option.value, PACKAGE="rzmq")
 }
 
 set.identity <- function(socket, option.value) {
-    .Call("set_identity",socket, option.value, PACKAGE="rzmq2")
+    .Call("set_identity",socket, option.value, PACKAGE="rzmq")
 }
 
 subscribe <- function(socket, option.value) {
-    invisible(.Call("subscribe",socket, option.value, PACKAGE="rzmq2"))
+    invisible(.Call("subscribe",socket, option.value, PACKAGE="rzmq"))
 }
 
 unsubscribe <- function(socket, option.value) {
-    .Call("unsubscribe",socket, option.value, PACKAGE="rzmq2")
+    .Call("unsubscribe",socket, option.value, PACKAGE="rzmq")
 }
 
 set.rate <- function(socket, option.value) {
-    .Call("set_rate",socket, option.value, PACKAGE="rzmq2")
+    .Call("set_rate",socket, option.value, PACKAGE="rzmq")
 }
 
 set.recovery.ivl <- function(socket, option.value) {
-    .Call("set_recovery_ivl",socket, option.value, PACKAGE="rzmq2")
+    .Call("set_recovery_ivl",socket, option.value, PACKAGE="rzmq")
 }
 
 set.recovery.ivl.msec <- function(socket, option.value) {
     if(zmq.version() >= "3.0.0") {
         stop("ZMQ_RECOVERY_IVL_MSEC removed from libzmq3")
     } else {
-        .Call("set_recovery_ivl_msec",socket, option.value, PACKAGE="rzmq2")
+        .Call("set_recovery_ivl_msec",socket, option.value, PACKAGE="rzmq")
     }
 }
 
@@ -153,44 +153,44 @@ set.mcast.loop <- function(socket, option.value) {
     if(zmq.version() >= "3.0.0") {
         stop("ZMQ_MCAST_LOOP removed from libzmq3")
     } else {
-        .Call("set_mcast_loop",socket, option.value, PACKAGE="rzmq2")
+        .Call("set_mcast_loop",socket, option.value, PACKAGE="rzmq")
     }
 }
 
 set.sndbuf <- function(socket, option.value) {
-    .Call("set_sndbuf",socket, option.value, PACKAGE="rzmq2")
+    .Call("set_sndbuf",socket, option.value, PACKAGE="rzmq")
 }
 
 set.rcvbuf <- function(socket, option.value) {
-    .Call("set_rcvbuf",socket, option.value, PACKAGE="rzmq2")
+    .Call("set_rcvbuf",socket, option.value, PACKAGE="rzmq")
 }
 
 set.linger <- function(socket, option.value) {
-    .Call("set_linger",socket, option.value, PACKAGE="rzmq2")
+    .Call("set_linger",socket, option.value, PACKAGE="rzmq")
 }
 
 set.reconnect.ivl <- function(socket, option.value) {
-    .Call("set_reconnect_ivl",socket, option.value, PACKAGE="rzmq2")
+    .Call("set_reconnect_ivl",socket, option.value, PACKAGE="rzmq")
 }
 
 set.zmq.backlog <- function(socket, option.value) {
-    .Call("set_zmq_backlog",socket, option.value, PACKAGE="rzmq2")
+    .Call("set_zmq_backlog",socket, option.value, PACKAGE="rzmq")
 }
 
 set.reconnect.ivl.max <- function(socket, option.value) {
-    .Call("set_reconnect_ivl_max",socket, option.value, PACKAGE="rzmq2")
+    .Call("set_reconnect_ivl_max",socket, option.value, PACKAGE="rzmq")
 }
 
 get.rcvmore <- function(socket) {
-    .Call("get_rcvmore",socket,PACKAGE="rzmq2")
+    .Call("get_rcvmore",socket,PACKAGE="rzmq")
 }
 
 set.send.timeout <- function(socket, option.value) {
-    .Call("set_sndtimeo", socket, option.value, PACKAGE="rzmq2")
+    .Call("set_sndtimeo", socket, option.value, PACKAGE="rzmq")
 }
 
 get.send.timeout <- function(socket) {
-    .Call("get_sndtimeo", socket, PACKAGE="rzmq2")
+    .Call("get_sndtimeo", socket, PACKAGE="rzmq")
 }
 
 #################################################################################
@@ -199,7 +199,7 @@ get.send.timeout <- function(socket) {
 
 zmq.version <- function( x = NULL ){
 
-  version__ <- invisible( .Call("get_zmq_version", PACKAGE="rzmq2") )
+  version__ <- invisible( .Call("get_zmq_version", PACKAGE="rzmq") )
 
   if( is.null( x ) ){
     return( version__ )
@@ -219,17 +219,17 @@ init.context <- function( io_threads = 1 ){
   io_threads <- as.integer( io_threads )
   if( io_threads < 1 )
       stop( 'ERROR: io_threads must be at least 1.\n' )
-  invisible( .Call( "initContext", io_threads, PACKAGE = "rzmq2" ) )
+  invisible( .Call( "initContext", io_threads, PACKAGE = "rzmq" ) )
 }
 
 close.socket <- function( socket ){
-  invisible( .Call( "closeSocket", socket, PACKAGE = "rzmq2" ) )
+  invisible( .Call( "closeSocket", socket, PACKAGE = "rzmq" ) )
 }
 
 get.keypair <- function(){
   if( zmq.version( 'major' ) < 4 )
       stop( 'ERROR: ZeroMQ must be version 4 or newer to use get.keypair.\n' )
-  keypair <- invisible( .Call( "get_keypair", PACKAGE = "rzmq2" ) )
+  keypair <- invisible( .Call( "get_keypair", PACKAGE = "rzmq" ) )
   names( keypair ) <- c( "public", "secret" )
   return( keypair )
 }
@@ -237,13 +237,13 @@ get.keypair <- function(){
 set.curve.server <- function( socket ){
   if( zmq.version( 'major' ) < 4 )
       stop( 'ERROR: ZeroMQ must be version 4 or newer to use set.curve.server.\n' )
-  invisible( .Call( "set_curve_server", socket, PACKAGE = "rzmq2" ) )
+  invisible( .Call( "set_curve_server", socket, PACKAGE = "rzmq" ) )
 }
 
 get.curve.server <- function( socket ){
   if( zmq.version( 'major' ) < 4 )
       stop( 'ERROR: ZeroMQ must be version 4 or newer to use get.curve.server.\n' )
-  curve_server <- invisible( .Call( "get_curve_server", socket, PACKAGE = "rzmq2" ) )
+  curve_server <- invisible( .Call( "get_curve_server", socket, PACKAGE = "rzmq" ) )
   return( curve_server )
 }
 
@@ -251,13 +251,13 @@ get.curve.server <- function( socket ){
 set.public.key <- function( socket, option.value ){
   if( zmq.version( 'major' ) < 4 )
       stop( 'ERROR: ZeroMQ must be version 4 or newer to use set.public.key.\n' )
-  invisible( .Call( "set_key", socket, "PUBLIC", as.character( option.value ), PACKAGE = "rzmq2" ) )
+  invisible( .Call( "set_key", socket, "PUBLIC", as.character( option.value ), PACKAGE = "rzmq" ) )
 }
 
 get.public.key <- function( socket ){
    if( zmq.version( 'major' ) < 4 )
       stop( 'ERROR: ZeroMQ must be version 4 or newer to use get.public.key.\n' )
-  public_key <- invisible( .Call( "get_key", socket, "PUBLIC", PACKAGE = "rzmq2" ) )
+  public_key <- invisible( .Call( "get_key", socket, "PUBLIC", PACKAGE = "rzmq" ) )
   return( public_key )
 }
 
@@ -265,13 +265,13 @@ get.public.key <- function( socket ){
 set.secret.key <- function( socket, option.value ){
   if( zmq.version( 'major' ) < 4 )
       stop( 'ERROR: ZeroMQ must be version 4 or newer to use set.secret.key.\n' )
-  invisible( .Call( "set_key", socket, "SECRET", as.character( option.value ), PACKAGE = "rzmq2" ) )
+  invisible( .Call( "set_key", socket, "SECRET", as.character( option.value ), PACKAGE = "rzmq" ) )
 }
 
 get.secret.key <- function( socket ){
   if( zmq.version( 'major' ) < 4 )
       stop( 'ERROR: ZeroMQ must be version 4 or newer to use get.secret.key.\n' )
-  secret_key <- invisible( .Call( "get_key", socket, "SECRET", PACKAGE = "rzmq2" ) )
+  secret_key <- invisible( .Call( "get_key", socket, "SECRET", PACKAGE = "rzmq" ) )
   return( secret_key )
 }
 
@@ -279,19 +279,19 @@ get.secret.key <- function( socket ){
 set.server.key <- function( socket, option.value ){
   if( zmq.version( 'major' ) < 4 )
       stop( 'ERROR: ZeroMQ must be version 4 or newer to use set.server.key.\n' )
-  invisible( .Call( "set_key", socket, "SERVER", as.character( option.value ), PACKAGE = "rzmq2" ) )
+  invisible( .Call( "set_key", socket, "SERVER", as.character( option.value ), PACKAGE = "rzmq" ) )
 }
 
 get.server.key <- function( socket ){
   if( zmq.version( 'major' ) < 4 )
       stop( 'ERROR: ZeroMQ must be version 4 or newer to use get.server.key.\n' )
-  server_key <- invisible( .Call( "get_key", socket, "SERVER", PACKAGE = "rzmq2" ) )
+  server_key <- invisible( .Call( "get_key", socket, "SERVER", PACKAGE = "rzmq" ) )
   return( server_key )
 }
 
 get.io_threads <- function( context ){
   if( zmq.version( 'major' ) < 4 )
       stop( 'ERROR: ZeroMQ must be version 4 or newer to use get.io_threads.\n' )
-  io_threads <- invisible( .Call( "get_io_threads", context, PACKAGE = "rzmq2" ) )
+  io_threads <- invisible( .Call( "get_io_threads", context, PACKAGE = "rzmq" ) )
   return( io_threads )
 }
