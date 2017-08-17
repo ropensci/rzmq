@@ -22,6 +22,7 @@
 #include <zmq.h>
 static_assert(ZMQ_VERSION_MAJOR >= 3,"The minimum required version of libzmq is 3.0.0.");
 #include <zmq.hpp>
+#include <signal.h>
 #include "interface.h"
 
 SEXP get_zmq_version() {
@@ -220,6 +221,7 @@ static short rzmq_build_event_bitmask(SEXP askevents) {
 
 SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
     SEXP result;
+    signal(SIGWINCH, SIG_IGN);
     
     if(TYPEOF(timeout_) != INTSXP) {
         error("poll timeout must be an integer.");
@@ -425,6 +427,7 @@ SEXP receiveNullMsg(SEXP socket_) {
 SEXP receiveSocket(SEXP socket_, SEXP dont_wait_) {
   SEXP ans;
   zmq::message_t msg;
+  signal(SIGWINCH, SIG_IGN);
 
   if(TYPEOF(dont_wait_) != LGLSXP) {
     REprintf("dont_wait type must be logical (LGLSXP).\n");
