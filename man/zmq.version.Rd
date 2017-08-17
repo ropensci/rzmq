@@ -7,12 +7,24 @@
   return the version string of the system zmq library
 }
 \usage{
-zmq.version()
+zmq.version(x=NULL)
 }
 
-\value{
-  a string of the following format: major.minor.patch
+\arguments{
+  \item{x}{The desired level in the version hierarchy.}
 }
+  
+\value{
+  If x == 'major' the return value is an integer representing the ZeroMQ
+  major version.
+  If x == 'minor' the return value is an integer representing the ZeroMQ
+  minor version.
+  If x == 'patch' the return value is an integer representing the ZeroMQ
+  patch.
+  If x is NULL the return value is a string of the following format:
+  major.minor.patch. This is the default.
+}
+
 \references{
   http://www.zeromq.org
   http://api.zeromq.org
