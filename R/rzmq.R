@@ -60,6 +60,17 @@ send.null.msg <- function(socket, send.more=FALSE) {
     .Call("sendNullMsg", socket, send.more, PACKAGE="rzmq")
 }
 
+init.message <- function(data, serialize=TRUE, xdr=.Platform$endian=="big") {
+    if(serialize) {
+        data <- serialize(data, NULL, xdr=xdr)
+    }
+    .Call("initMessage", data, PACKAGE="rzmq")
+}
+
+send.message.object <- function(socket, msg, send.more=FALSE) {
+    .Call("sendMessageObject", socket, msg)
+}
+
 receive.null.msg <- function(socket) {
     .Call("receiveNullMsg", socket, PACKAGE="rzmq")
 }

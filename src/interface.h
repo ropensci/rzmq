@@ -24,6 +24,7 @@
 
 static void contextFinalizer(SEXP context_);
 static void socketFinalizer(SEXP socket_);
+static void messageFinalizer(SEXP msg_);
 SEXP rzmq_serialize(SEXP data, SEXP rho);
 SEXP rzmq_unserialize(SEXP data, SEXP rho);
 
@@ -40,6 +41,8 @@ extern "C" {
   SEXP sendNullMsg(SEXP socket_, SEXP send_more_);
   SEXP receiveNullMsg(SEXP socket_);
   SEXP sendRawString(SEXP socket_, SEXP data_, SEXP send_more_);
+  SEXP initMessage(SEXP data_);
+  SEXP sendMessageObject(SEXP socket_, SEXP data_, SEXP send_more_);
   SEXP receiveSocket(SEXP socket_, SEXP flags_);
   SEXP receiveString(SEXP socket_);
   SEXP receiveInt(SEXP socket_);

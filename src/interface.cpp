@@ -123,6 +123,14 @@ static void socketFinalizer(SEXP socket_) {
   }
 }
 
+static void messageFinalizer(SEXP msg_) {
+  zmq::message_t* msg = reinterpret_cast<zmq::message_t*>(checkExternalPointer(msg_,"zmq::message_t*"));
+  if(msg) {
+    delete msg; // destructor will call zmq_msg_close()
+    R_ClearExternalPtr(msg_);
+  }
+}
+
 SEXP initContext() {
   SEXP context_;
   zmq::context_t* context;
@@ -398,6 +406,54 @@ SEXP sendNullMsg(SEXP socket_, SEXP send_more_) {
       status = socket->send(msg,ZMQ_SNDMORE);
     } else {
       status = socket->send(msg);
+    }
+  } catch(std::exception& e) {
+    REprintf("%s\n",e.what());
+  }
+  LOGICAL(ans)[0] = static_cast<int>(status);
+  UNPROTECT(1);
+  return ans;
+}
+
+SEXP initMessage(SEXP data_) {
+  SEXP msg_;
+
+  if(TYPEOF(data_) != RAWSXP) {
+    REprintf("data type must be raw (RAWSXP).\n");
+    UNPROTECT(1);
+    return R_NilValue;
+  }
+
+  zmq::message_t msg (reinterpret_cast<void*>(data_), length(data_), NULL);
+  PROTECT(msg_ = R_MakeExternalPtr(reinterpret_cast<void*>(&msg),install("zmq::message_t*"),R_NilValue));
+  R_RegisterCFinalizerEx(msg_, messageFinalizer, TRUE);
+  UNPROTECT(1);
+  return msg_;
+}
+
+SEXP sendMessageObject(SEXP socket_, SEXP msg_, SEXP send_more_) {
+  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1));
+  bool status(false);
+
+  zmq::message_t* msg(NULL);
+  zmq::message_t copy(0);
+  try {
+    msg = reinterpret_cast<zmq::message_t*>(&msg_);
+  } catch(std::logic_error &e) {
+    REprintf("%s\n",e.what());
+    return R_NilValue;
+  }
+  msg->copy(&copy);
+
+  zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
+  if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
+
+  bool send_more = LOGICAL(send_more_)[0];
+  try {
+    if(send_more) {
+      status = socket->send(copy,ZMQ_SNDMORE);
+    } else {
+      status = socket->send(copy);
     }
   } catch(std::exception& e) {
     REprintf("%s\n",e.what());
