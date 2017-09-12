@@ -32,7 +32,7 @@ extern "C" {
   SEXP get_zmq_version();
   SEXP get_zmq_errno();
   SEXP get_zmq_strerror();
-  SEXP initContext();
+  SEXP initContext(SEXP threads_);
   SEXP initSocket(SEXP context_, SEXP socket_type_);
   SEXP bindSocket(SEXP socket_, SEXP address_);
   SEXP connectSocket(SEXP socket_, SEXP address_);

@@ -27,8 +27,8 @@ zmq.strerror <- function() {
     .Call("get_zmq_strerror", PACKAGE="rzmq")
 }
 
-init.context <- function() {
-    .Call("initContext", PACKAGE="rzmq")
+init.context <- function(threads=1L) {
+    .Call("initContext", threads, PACKAGE="rzmq")
 }
 
 init.socket <- function(context, socket.type) {

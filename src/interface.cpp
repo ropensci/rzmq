@@ -131,11 +131,15 @@ static void messageFinalizer(SEXP msg_) {
   }
 }
 
-SEXP initContext() {
+SEXP initContext(SEXP threads_) {
+  if(TYPEOF(threads_) != INTSXP) {
+    error("thread number must be an integer.");
+  }
+
   SEXP context_;
   zmq::context_t* context;
   try {
-    context = new zmq::context_t(1);
+    context = new zmq::context_t(*INTEGER(threads_));
   } catch(std::exception& e) {
     REprintf("%s\n",e.what());
     return R_NilValue;
