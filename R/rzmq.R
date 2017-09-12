@@ -68,7 +68,7 @@ init.message <- function(data, serialize=TRUE, xdr=.Platform$endian=="big") {
 }
 
 send.message.object <- function(socket, msg, send.more=FALSE) {
-    .Call("sendMessageObject", socket, msg)
+    .Call("sendMessageObject", socket, msg, send.more)
 }
 
 receive.null.msg <- function(socket) {
