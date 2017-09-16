@@ -2,6 +2,7 @@
 \alias{send.socket}
 \alias{send.null.msg}
 \alias{send.raw.string}
+\alias{send.message.object}
 \title{
   send a message.
 }
