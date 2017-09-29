@@ -5,15 +5,16 @@
   initailize zmq context and zmq socket
 }
 \description{
-  initailize zmq context and zmq socket for to be used for further zmq operations.
+  initialize zmq context and zmq socket for to be used for further zmq operations.
 }
 \usage{
-init.context()
+init.context(threads=1L)
 init.socket(context, socket.type)
 }
 
 \arguments{
-  \item{context}{returns a zmq context object.}
+  \item{threads}{number of threads for the context to use}
+  \item{context}{a zmq context object.}
   \item{socket.type}{ The ZMQ socket type requested
     e.g. ZMQ_REQ,ZMQ_REP,ZMQ_PULL,ZMQ_PUSH, etc.}
 }

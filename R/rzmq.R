@@ -27,8 +27,8 @@ zmq.strerror <- function() {
     .Call("get_zmq_strerror", PACKAGE="rzmq")
 }
 
-init.context <- function() {
-    .Call("initContext", PACKAGE="rzmq")
+init.context <- function(threads=1L) {
+    .Call("initContext", threads, PACKAGE="rzmq")
 }
 
 init.socket <- function(context, socket.type) {
@@ -58,6 +58,17 @@ send.socket <- function(socket, data, send.more=FALSE, serialize=TRUE,
 
 send.null.msg <- function(socket, send.more=FALSE) {
     .Call("sendNullMsg", socket, send.more, PACKAGE="rzmq")
+}
+
+init.message <- function(data, serialize=TRUE, xdr=.Platform$endian=="big") {
+    if(serialize) {
+        data <- serialize(data, NULL, xdr=xdr)
+    }
+    .Call("initMessage", data, PACKAGE="rzmq")
+}
+
+send.message.object <- function(socket, msg, send.more=FALSE) {
+    .Call("sendMessageObject", socket, msg, send.more)
 }
 
 receive.null.msg <- function(socket) {
