@@ -1,6 +1,6 @@
 Package: rzmq
 Title: R Bindings for 'ZeroMQ'
-Version: 0.9.2
+Version: 0.9.3
 Authors@R: c(
     person("Whit", "Armstrong", , "armstrong.whit@gmail.com", role = "aut"),
     person("Jeroen", "Ooms", , "jeroen@berkeley.edu", role = c("aut", "cre")))
