@@ -1,5 +1,6 @@
 0.9.3
   - Reuse messages in rzmq #39
+  - Explicitly ignore SIGWINCH signal when waiting
 
 0.9.2
   - Add XREQ, XREP socket types (Michael Schubert #32) 
