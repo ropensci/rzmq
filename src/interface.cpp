@@ -233,7 +233,9 @@ static short rzmq_build_event_bitmask(SEXP askevents) {
 
 SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
     SEXP result;
+#ifdef SIGWINCH
     signal(SIGWINCH, SIG_IGN);
+#endif
     
     if(TYPEOF(timeout_) != INTSXP) {
         error("poll timeout must be an integer.");
@@ -492,7 +494,9 @@ SEXP receiveNullMsg(SEXP socket_) {
 SEXP receiveSocket(SEXP socket_, SEXP dont_wait_) {
   SEXP ans;
   zmq::message_t msg;
+#ifdef SIGWINCH
   signal(SIGWINCH, SIG_IGN);
+#endif
 
   if(TYPEOF(dont_wait_) != LGLSXP) {
     REprintf("dont_wait type must be logical (LGLSXP).\n");
