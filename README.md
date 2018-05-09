@@ -1,6 +1,6 @@
 ## rzmq 
 [![Build Status](https://travis-ci.org/ropensci/rzmq.svg)](https://travis-ci.org/ropensci/rzmq)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/jeroen/rzmq?branch=master&svg=true)](https://ci.appveyor.com/project/jeroen/rzmq)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/ropensci/rzmq?branch=master&svg=true)](https://ci.appveyor.com/project/jeroen/rzmq)
 [![Package-License](http://img.shields.io/badge/license-GPL--3-brightgreen.svg?style=flat)](http://www.gnu.org/licenses/gpl-3.0.html) [![CRAN](http://www.r-pkg.org/badges/version/rzmq)](https://cran.r-project.org/package=rzmq) [![Downloads](http://cranlogs.r-pkg.org/badges/rzmq?color=brightgreen)](http://www.r-pkg.org/pkg/rzmq)
 
 ### Purpose
