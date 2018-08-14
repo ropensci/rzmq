@@ -25,6 +25,21 @@ static_assert(ZMQ_VERSION_MAJOR >= 3,"The minimum required version of libzmq is 
 #include <signal.h>
 #include "interface.h"
 
+void s_signal_handler (int signal_value) {
+    std::stringstream msg;
+    msg << "Interrupted on signal " << signal_value;
+    throw(std::runtime_error(msg.str()));
+}
+
+void s_catch_signals (void) {
+    struct sigaction action;
+    action.sa_handler = s_signal_handler;
+    action.sa_flags = SA_RESTART;
+    sigemptyset (&action.sa_mask);
+    sigaction (SIGINT, &action, NULL);
+    sigaction (SIGTERM, &action, NULL);
+}
+
 SEXP get_zmq_version() {
   SEXP ans;
   int major, minor, patch;
@@ -233,10 +248,8 @@ static short rzmq_build_event_bitmask(SEXP askevents) {
 
 SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
     SEXP result;
-#ifdef SIGWINCH
-    signal(SIGWINCH, SIG_IGN);
-#endif
-    
+    s_catch_signals();
+
     if(TYPEOF(timeout_) != INTSXP) {
         error("poll timeout must be an integer.");
     }
@@ -304,15 +317,24 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
                 setAttrib(events, R_NamesSymbol, names);
                 SET_VECTOR_ELT(result, i, events);
             }
+
+            // Release the result list (1), and per socket
+            // events lists with associated names (2*nsock).
+            UNPROTECT(1 + 2*nsock);
+            return result;
         } else {
             error("polling zmq sockets failed.");
         }
+    } catch(zmq::error_t& e) {
+        if (errno == ETERM)
+            throw(std::runtime_error("ZeroMQ error: ETERM"));
+        if (errno == EFAULT)
+            throw(std::runtime_error("ZeroMQ error: EFAULT"));
+        // let the signal handler handle EINTR
     } catch(std::exception& e) {
         error(e.what());
     }
-    // Release the result list (1), and per socket
-    // events lists with associated names (2*nsock).
-    UNPROTECT(1 + 2*nsock);
+    UNPROTECT(1);
     return result;
 }
 
@@ -494,9 +516,6 @@ SEXP receiveNullMsg(SEXP socket_) {
 SEXP receiveSocket(SEXP socket_, SEXP dont_wait_) {
   SEXP ans;
   zmq::message_t msg;
-#ifdef SIGWINCH
-  signal(SIGWINCH, SIG_IGN);
-#endif
 
   if(TYPEOF(dont_wait_) != LGLSXP) {
     REprintf("dont_wait type must be logical (LGLSXP).\n");
