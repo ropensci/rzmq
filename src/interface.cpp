@@ -25,13 +25,13 @@ static_assert(ZMQ_VERSION_MAJOR >= 3,"The minimum required version of libzmq is 
 #include <signal.h>
 #include "interface.h"
 
-void s_signal_handler (int signal_value) {
-    std::stringstream msg;
-    msg << "Interrupted on signal " << signal_value;
-    throw(std::runtime_error(msg.str()));
+static int s_interrupted = 0;
+
+static void s_signal_handler (int signal_value) {
+    s_interrupted = 1;
 }
 
-void s_catch_signals (void) {
+static void s_catch_signals (void) {
     struct sigaction action;
     action.sa_handler = s_signal_handler;
     action.sa_flags = SA_RESTART;
@@ -327,12 +327,18 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
         }
     } catch(zmq::error_t& e) {
         if (errno == ETERM)
-            throw(std::runtime_error("ZeroMQ error: ETERM"));
+            error("At least one of the members of the 'items' array refers to "
+                  "a 'socket' whose associated 0MQ 'context' was terminated.");
         if (errno == EFAULT)
-            throw(std::runtime_error("ZeroMQ error: EFAULT"));
-        // let the signal handler handle EINTR
+            error("The provided 'items' was not valid (NULL).");
     } catch(std::exception& e) {
         error(e.what());
+    }
+    if (s_interrupted) {
+        s_interrupted = 0;
+        raise(SIGINT);
+        error("The operation was interrupted by delivery of a signal "
+              "before any events were available.");
     }
     UNPROTECT(1);
     return result;
