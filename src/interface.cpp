@@ -282,49 +282,45 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
 
         int rc = zmq::poll(pitems, nsock, *INTEGER(timeout_));
 
-        if(rc >= 0) {
-            for (int i = 0; i < nsock; i++) {
-                SEXP events, names;
+        for (int i = 0; i < nsock; i++) {
+            SEXP events, names;
 
-                // Pre count number of polled events so we can
-                // allocate appropriately sized lists.
-                short eventcount = 0;
-                if (pitems[i].events & ZMQ_POLLIN) eventcount++;
-                if (pitems[i].events & ZMQ_POLLOUT) eventcount++;
-                if (pitems[i].events & ZMQ_POLLERR) eventcount++;
+            // Pre count number of polled events so we can
+            // allocate appropriately sized lists.
+            short eventcount = 0;
+            if (pitems[i].events & ZMQ_POLLIN) eventcount++;
+            if (pitems[i].events & ZMQ_POLLOUT) eventcount++;
+            if (pitems[i].events & ZMQ_POLLERR) eventcount++;
 
-                PROTECT(events = allocVector(VECSXP, eventcount));
-                PROTECT(names = allocVector(VECSXP, eventcount));
+            PROTECT(events = allocVector(VECSXP, eventcount));
+            PROTECT(names = allocVector(VECSXP, eventcount));
 
-                eventcount = 0;
-                if (pitems[i].events & ZMQ_POLLIN) {
-                    SET_VECTOR_ELT(events, eventcount, ScalarLogical(pitems[i].revents & ZMQ_POLLIN));
-                    SET_VECTOR_ELT(names, eventcount, mkChar("read"));
-                    eventcount++;
-                }
-
-                if (pitems[i].events & ZMQ_POLLOUT) {
-                    SET_VECTOR_ELT(names, eventcount, mkChar("write"));
-
-                    SET_VECTOR_ELT(events, eventcount, ScalarLogical(pitems[i].revents & ZMQ_POLLOUT));
-                    eventcount++;
-                }
-
-                if (pitems[i].events & ZMQ_POLLERR) {
-                    SET_VECTOR_ELT(names, eventcount, mkChar("error"));
-                    SET_VECTOR_ELT(events, eventcount, ScalarLogical(pitems[i].revents & ZMQ_POLLERR));
-                }
-                setAttrib(events, R_NamesSymbol, names);
-                SET_VECTOR_ELT(result, i, events);
+            eventcount = 0;
+            if (pitems[i].events & ZMQ_POLLIN) {
+                SET_VECTOR_ELT(events, eventcount, ScalarLogical(pitems[i].revents & ZMQ_POLLIN));
+                SET_VECTOR_ELT(names, eventcount, mkChar("read"));
+                eventcount++;
             }
 
-            // Release the result list (1), and per socket
-            // events lists with associated names (2*nsock).
-            UNPROTECT(1 + 2*nsock);
-            return result;
-        } else {
-            error("polling zmq sockets failed.");
+            if (pitems[i].events & ZMQ_POLLOUT) {
+                SET_VECTOR_ELT(names, eventcount, mkChar("write"));
+
+                SET_VECTOR_ELT(events, eventcount, ScalarLogical(pitems[i].revents & ZMQ_POLLOUT));
+                eventcount++;
+            }
+
+            if (pitems[i].events & ZMQ_POLLERR) {
+                SET_VECTOR_ELT(names, eventcount, mkChar("error"));
+                SET_VECTOR_ELT(events, eventcount, ScalarLogical(pitems[i].revents & ZMQ_POLLERR));
+            }
+            setAttrib(events, R_NamesSymbol, names);
+            SET_VECTOR_ELT(result, i, events);
         }
+
+        // Release the result list (1), and per socket
+        // events lists with associated names (2*nsock).
+        UNPROTECT(1 + 2*nsock);
+        return result;
     } catch(zmq::error_t& e) {
         if (errno == ETERM)
             error("At least one of the members of the 'items' array refers to "
