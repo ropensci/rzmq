@@ -325,14 +325,13 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
         if (errno == ETERM)
             error("At least one of the members of the 'items' array refers to "
                   "a 'socket' whose associated 0MQ 'context' was terminated.");
-        if (errno == EFAULT)
+        else if (errno == EFAULT)
             error("The provided 'items' was not valid (NULL).");
     } catch(std::exception& e) {
         error(e.what());
     }
     if (s_interrupted) {
         s_interrupted = 0;
-        raise(SIGINT);
         error("The operation was interrupted by delivery of a signal "
               "before any events were available.");
     }
