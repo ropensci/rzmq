@@ -32,12 +32,14 @@ static void s_signal_handler (int signal_value) {
 }
 
 static void s_catch_signals (void) {
+#ifdef sigaction
     struct sigaction action;
     action.sa_handler = s_signal_handler;
     action.sa_flags = SA_RESTART;
     sigemptyset (&action.sa_mask);
     sigaction (SIGINT, &action, NULL);
     sigaction (SIGTERM, &action, NULL);
+#endif
 }
 
 SEXP get_zmq_version() {
