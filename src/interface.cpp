@@ -320,22 +320,23 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
         // Release the result list (1), and per socket
         // events lists with associated names (2*nsock).
         UNPROTECT(1 + 2*nsock);
-        return result;
     } catch(zmq::error_t& e) {
-        if (errno == ETERM)
+        if (errno == ETERM) {
             error("At least one of the members of the 'items' array refers to "
                   "a 'socket' whose associated 0MQ 'context' was terminated.");
-        else if (errno == EFAULT)
+        } else if (errno == EFAULT) {
             error("The provided 'items' was not valid (NULL).");
+        } else if (errno == EINTR) {
+            if (s_interrupted) {
+                s_interrupted = 0;
+                error("The operation was interrupted by delivery of a signal "
+                      "before any events were available.");
+            } else // empty list on non-critical interrupt
+                UNPROTECT(1);
+        }
     } catch(std::exception& e) {
         error(e.what());
     }
-    if (s_interrupted) {
-        s_interrupted = 0;
-        error("The operation was interrupted by delivery of a signal "
-              "before any events were available.");
-    }
-    UNPROTECT(1);
     return result;
 }
 
