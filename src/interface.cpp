@@ -38,7 +38,6 @@ static void s_catch_signals (void) {
     action.sa_flags = SA_RESTART;
     sigemptyset (&action.sa_mask);
     sigaction (SIGINT, &action, NULL);
-    sigaction (SIGTERM, &action, NULL);
 #endif
 }
 
