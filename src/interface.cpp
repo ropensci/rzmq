@@ -23,22 +23,20 @@
 static_assert(ZMQ_VERSION_MAJOR >= 3,"The minimum required version of libzmq is 3.0.0.");
 #include <zmq.hpp>
 #include <signal.h>
+#include <R_ext/Utils.h>
+#include <chrono>
 #include "interface.h"
 
-static int s_interrupted = 0;
+typedef std::chrono::high_resolution_clock Time;
+typedef std::chrono::milliseconds ms;
 
-static void s_signal_handler (int signal_value) {
-    s_interrupted = 1;
+/* Check for interrupt without long jumping */
+void check_interrupt_fn(void *dummy) {
+    R_CheckUserInterrupt();
 }
 
-static void s_catch_signals (void) {
-#ifdef sigaction
-    struct sigaction action;
-    action.sa_handler = s_signal_handler;
-    action.sa_flags = SA_RESTART;
-    sigemptyset (&action.sa_mask);
-    sigaction (SIGINT, &action, NULL);
-#endif
+int pending_interrupt() {
+    return !(R_ToplevelExec(check_interrupt_fn, NULL));
 }
 
 SEXP get_zmq_version() {
@@ -249,7 +247,6 @@ static short rzmq_build_event_bitmask(SEXP askevents) {
 
 SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
     SEXP result;
-    s_catch_signals();
 
     if(TYPEOF(timeout_) != INTSXP) {
         error("poll timeout must be an integer.");
@@ -281,7 +278,23 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
             pitems[i].events = rzmq_build_event_bitmask(VECTOR_ELT(events_, i));
         }
 
-        int rc = zmq::poll(pitems, nsock, *INTEGER(timeout_));
+        int timeout = *INTEGER(timeout_);
+        int rc = -1;
+        auto start = Time::now();
+        do {
+            try {
+                rc = zmq::poll(pitems, nsock, timeout);
+            } catch(zmq::error_t& e) {
+                if (errno != EINTR || pending_interrupt())
+                    throw e;
+                if (timeout != -1) {
+                    ms dt = std::chrono::duration_cast<ms>(Time::now() - start);
+                    timeout = timeout - dt.count();
+                    if (timeout <= 0)
+                        break;
+                }
+            }
+        } while(rc < 0);
 
         for (int i = 0; i < nsock; i++) {
             SEXP events, names;
@@ -321,6 +334,7 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
         // Release the result list (1), and per socket
         // events lists with associated names (2*nsock).
         UNPROTECT(1 + 2*nsock);
+        return result;
     } catch(zmq::error_t& e) {
         if (errno == ETERM) {
             error("At least one of the members of the 'items' array refers to "
@@ -328,17 +342,13 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
         } else if (errno == EFAULT) {
             error("The provided 'items' was not valid (NULL).");
         } else if (errno == EINTR) {
-            if (s_interrupted) {
-                s_interrupted = 0;
-                error("The operation was interrupted by delivery of a signal "
-                      "before any events were available.");
-            } else // empty list on non-critical interrupt
-                UNPROTECT(1);
-        }
+            error("The operation was interrupted by delivery of a signal "
+                  "before any events were available.");
+        } else
+            throw e;
     } catch(std::exception& e) {
         error(e.what());
     }
-    return result;
 }
 
 SEXP connectSocket(SEXP socket_, SEXP address_) {
