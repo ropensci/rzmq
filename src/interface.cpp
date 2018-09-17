@@ -23,7 +23,21 @@
 static_assert(ZMQ_VERSION_MAJOR >= 3,"The minimum required version of libzmq is 3.0.0.");
 #include <zmq.hpp>
 #include <signal.h>
+#include <R_ext/Utils.h>
+#include <chrono>
 #include "interface.h"
+
+typedef std::chrono::high_resolution_clock Time;
+typedef std::chrono::milliseconds ms;
+
+/* Check for interrupt without long jumping */
+void check_interrupt_fn(void *dummy) {
+    R_CheckUserInterrupt();
+}
+
+int pending_interrupt() {
+    return !(R_ToplevelExec(check_interrupt_fn, NULL));
+}
 
 SEXP get_zmq_version() {
   SEXP ans;
@@ -233,10 +247,7 @@ static short rzmq_build_event_bitmask(SEXP askevents) {
 
 SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
     SEXP result;
-#ifdef SIGWINCH
-    signal(SIGWINCH, SIG_IGN);
-#endif
-    
+
     if(TYPEOF(timeout_) != INTSXP) {
         error("poll timeout must be an integer.");
     }
@@ -267,53 +278,77 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
             pitems[i].events = rzmq_build_event_bitmask(VECTOR_ELT(events_, i));
         }
 
-        int rc = zmq::poll(pitems, nsock, *INTEGER(timeout_));
-
-        if(rc >= 0) {
-            for (int i = 0; i < nsock; i++) {
-                SEXP events, names;
-
-                // Pre count number of polled events so we can
-                // allocate appropriately sized lists.
-                short eventcount = 0;
-                if (pitems[i].events & ZMQ_POLLIN) eventcount++;
-                if (pitems[i].events & ZMQ_POLLOUT) eventcount++;
-                if (pitems[i].events & ZMQ_POLLERR) eventcount++;
-
-                PROTECT(events = allocVector(VECSXP, eventcount));
-                PROTECT(names = allocVector(VECSXP, eventcount));
-
-                eventcount = 0;
-                if (pitems[i].events & ZMQ_POLLIN) {
-                    SET_VECTOR_ELT(events, eventcount, ScalarLogical(pitems[i].revents & ZMQ_POLLIN));
-                    SET_VECTOR_ELT(names, eventcount, mkChar("read"));
-                    eventcount++;
+        int timeout = *INTEGER(timeout_);
+        int rc = -1;
+        auto start = Time::now();
+        do {
+            try {
+                rc = zmq::poll(pitems, nsock, timeout);
+            } catch(zmq::error_t& e) {
+                if (errno != EINTR || pending_interrupt())
+                    throw e;
+                if (timeout != -1) {
+                    ms dt = std::chrono::duration_cast<ms>(Time::now() - start);
+                    timeout = timeout - dt.count();
+                    if (timeout <= 0)
+                        break;
                 }
-
-                if (pitems[i].events & ZMQ_POLLOUT) {
-                    SET_VECTOR_ELT(names, eventcount, mkChar("write"));
-
-                    SET_VECTOR_ELT(events, eventcount, ScalarLogical(pitems[i].revents & ZMQ_POLLOUT));
-                    eventcount++;
-                }
-
-                if (pitems[i].events & ZMQ_POLLERR) {
-                    SET_VECTOR_ELT(names, eventcount, mkChar("error"));
-                    SET_VECTOR_ELT(events, eventcount, ScalarLogical(pitems[i].revents & ZMQ_POLLERR));
-                }
-                setAttrib(events, R_NamesSymbol, names);
-                SET_VECTOR_ELT(result, i, events);
             }
-        } else {
-            error("polling zmq sockets failed.");
+        } while(rc < 0);
+
+        for (int i = 0; i < nsock; i++) {
+            SEXP events, names;
+
+            // Pre count number of polled events so we can
+            // allocate appropriately sized lists.
+            short eventcount = 0;
+            if (pitems[i].events & ZMQ_POLLIN) eventcount++;
+            if (pitems[i].events & ZMQ_POLLOUT) eventcount++;
+            if (pitems[i].events & ZMQ_POLLERR) eventcount++;
+
+            PROTECT(events = allocVector(VECSXP, eventcount));
+            PROTECT(names = allocVector(VECSXP, eventcount));
+
+            eventcount = 0;
+            if (pitems[i].events & ZMQ_POLLIN) {
+                SET_VECTOR_ELT(events, eventcount, ScalarLogical(pitems[i].revents & ZMQ_POLLIN));
+                SET_VECTOR_ELT(names, eventcount, mkChar("read"));
+                eventcount++;
+            }
+
+            if (pitems[i].events & ZMQ_POLLOUT) {
+                SET_VECTOR_ELT(names, eventcount, mkChar("write"));
+
+                SET_VECTOR_ELT(events, eventcount, ScalarLogical(pitems[i].revents & ZMQ_POLLOUT));
+                eventcount++;
+            }
+
+            if (pitems[i].events & ZMQ_POLLERR) {
+                SET_VECTOR_ELT(names, eventcount, mkChar("error"));
+                SET_VECTOR_ELT(events, eventcount, ScalarLogical(pitems[i].revents & ZMQ_POLLERR));
+            }
+            setAttrib(events, R_NamesSymbol, names);
+            SET_VECTOR_ELT(result, i, events);
         }
+
+        // Release the result list (1), and per socket
+        // events lists with associated names (2*nsock).
+        UNPROTECT(1 + 2*nsock);
+        return result;
+    } catch(zmq::error_t& e) {
+        if (errno == ETERM) {
+            error("At least one of the members of the 'items' array refers to "
+                  "a 'socket' whose associated 0MQ 'context' was terminated.");
+        } else if (errno == EFAULT) {
+            error("The provided 'items' was not valid (NULL).");
+        } else if (errno == EINTR) {
+            error("The operation was interrupted by delivery of a signal "
+                  "before any events were available.");
+        } else
+            throw e;
     } catch(std::exception& e) {
         error(e.what());
     }
-    // Release the result list (1), and per socket
-    // events lists with associated names (2*nsock).
-    UNPROTECT(1 + 2*nsock);
-    return result;
 }
 
 SEXP connectSocket(SEXP socket_, SEXP address_) {
@@ -494,9 +529,6 @@ SEXP receiveNullMsg(SEXP socket_) {
 SEXP receiveSocket(SEXP socket_, SEXP dont_wait_) {
   SEXP ans;
   zmq::message_t msg;
-#ifdef SIGWINCH
-  signal(SIGWINCH, SIG_IGN);
-#endif
 
   if(TYPEOF(dont_wait_) != LGLSXP) {
     REprintf("dont_wait type must be logical (LGLSXP).\n");
