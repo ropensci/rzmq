@@ -31,10 +31,10 @@ Installation from source requires [`ZeroMQ`](http://zeromq.org/area:download). O
 sudo apt-get install -y libzmq3-dev
 ```
 
-On __Fedora__ we need [zeromq3-devel](https://apps.fedoraproject.org/packages/zeromq3-devel):
+On __Fedora__ we need [zeromq-devel](https://apps.fedoraproject.org/packages/zeromq-devel):
 
 ```
-sudo yum install zeromq3-devel
+sudo yum install zeromq-devel
 ````
 
 On __CentOS / RHEL__ we install [zeromq3-devel](https://apps.fedoraproject.org/packages/zeromq3-devel) via EPEL:
