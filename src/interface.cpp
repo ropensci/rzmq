@@ -17,6 +17,8 @@
 
 #include <sstream>
 #include <zmq.hpp>
+#include <chrono>
+#include <stdexcept>
 static_assert(ZMQ_VERSION_MAJOR >= 3,"The minimum required version of libzmq is 3.0.0.");
 #include "interface.h"
 
