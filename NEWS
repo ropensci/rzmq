@@ -1,3 +1,6 @@
+0.9.4
+  - Catching signals and interrupts when polling (Michael Schubert #46) 
+  
 0.9.3
   - Reuse messages in rzmq #39
   - Explicitly ignore SIGWINCH signal when waiting
