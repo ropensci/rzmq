@@ -15,16 +15,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>. //
 ///////////////////////////////////////////////////////////////////////////
 
-#include <stdint.h>
-#include <string>
 #include <sstream>
-#include <stdexcept>
-#include <zmq.h>
-static_assert(ZMQ_VERSION_MAJOR >= 3,"The minimum required version of libzmq is 3.0.0.");
 #include <zmq.hpp>
-#include <signal.h>
-#include <R_ext/Utils.h>
-#include <chrono>
+static_assert(ZMQ_VERSION_MAJOR >= 3,"The minimum required version of libzmq is 3.0.0.");
 #include "interface.h"
 
 typedef std::chrono::high_resolution_clock Time;
