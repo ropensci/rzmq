@@ -404,8 +404,8 @@ SEXP sendSocket(SEXP socket_, SEXP data_, SEXP send_more_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
 
-  zmq::message_t msg (length(data_));
-  memcpy(msg.data(), RAW(data_), length(data_));
+  zmq::message_t msg (Rf_xlength(data_));
+  memcpy(msg.data(), RAW(data_), Rf_xlength(data_));
 
   bool send_more = LOGICAL(send_more_)[0];
   try {
@@ -460,10 +460,10 @@ SEXP initMessage(SEXP data_) {
     return R_NilValue;
   }
 
-  zmq::message_t* msg = new zmq::message_t(length(data_));
-  memcpy(msg->data(), RAW(data_), length(data_));
+  zmq::message_t* msg = new zmq::message_t(Rf_xlength(data_));
+  memcpy(msg->data(), RAW(data_), Rf_xlength(data_));
 // no copy below, see first that one copy works
-//  zmq::message_t msg(reinterpret_cast<void*>(data_), length(data_), NULL);
+//  zmq::message_t msg(reinterpret_cast<void*>(data_), Rf_xlength(data_), NULL);
 
   PROTECT(msg_ = R_MakeExternalPtr(reinterpret_cast<void*>(msg),install("zmq::message_t*"),R_NilValue));
   R_RegisterCFinalizerEx(msg_, messageFinalizer, TRUE);
