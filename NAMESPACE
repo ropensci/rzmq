@@ -37,5 +37,6 @@ export(zmq.version,
        set.send.timeout,
        get.send.timeout,
        set.send.hwm,
-       set.rcv.hwm
+       set.rcv.hwm,
+       set.tcp.keepalive
        )

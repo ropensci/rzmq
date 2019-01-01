@@ -123,6 +123,14 @@ int string_to_option_type(const std::string s) {
     return ZMQ_SNDHWM;
   } else if (s == "ZMQ_RCVHWM") {
     return ZMQ_RCVHWM;
+  } else if (s == "ZMQ_TCP_KEEPALIVE") {
+    return ZMQ_TCP_KEEPALIVE;
+  } else if (s == "ZMQ_TCP_KEEPALIVE_IDLE") {
+    return ZMQ_TCP_KEEPALIVE_IDLE;
+  } else if (s == "ZMQ_TCP_KEEPALIVE_CNT") {
+    return ZMQ_TCP_KEEPALIVE_CNT;
+  } else if (s == "ZMQ_TCP_KEEPALIVE_INTVL") {
+    return ZMQ_TCP_KEEPALIVE_INTVL;
   } else {
     return -1;
   }

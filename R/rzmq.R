@@ -187,3 +187,10 @@ set.send.hwm <- function(socket, option.value) {
 set.rcv.hwm <- function(socket, option.value) {
     .Call("setSockOptInt", socket, "ZMQ_RCVHWM", option.value, PACKAGE="rzmq")
 }
+
+set.tcp.keepalive <- function(socket, active=-1L, idle=-1L, count=-1L, interval=-1L) {
+    .Call("setSockOptInt", socket, "ZMQ_TCP_KEEPALIVE", active, PACKAGE="rzmq")
+    .Call("setSockOptInt", socket, "ZMQ_TCP_KEEPALIVE_IDLE", idle, PACKAGE="rzmq")
+    .Call("setSockOptInt", socket, "ZMQ_TCP_KEEPALIVE_CNT", count, PACKAGE="rzmq")
+    .Call("setSockOptInt", socket, "ZMQ_TCP_KEEPALIVE_INTVL", interval, PACKAGE="rzmq")
+}
