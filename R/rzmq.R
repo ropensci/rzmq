@@ -121,59 +121,59 @@ poll.socket <- function(sockets, events, timeout=0L) {
 }
 
 set.affinity <- function(socket, option.value) {
-    .Call("set_affinity",socket, option.value, PACKAGE="rzmq")
+    .Call("setSockOptInt", socket, "ZMQ_AFFINITY", option.value, PACKAGE="rzmq")
 }
 
 set.identity <- function(socket, option.value) {
-    .Call("set_identity",socket, option.value, PACKAGE="rzmq")
+    .Call("setSockOptChr", socket, "ZMQ_IDENTITY", option.value, PACKAGE="rzmq")
 }
 
 subscribe <- function(socket, option.value) {
-    invisible(.Call("subscribe",socket, option.value, PACKAGE="rzmq"))
+    invisible(.Call("setSockOptChr", socket, "ZMQ_SUBSCRIBE", option.value, PACKAGE="rzmq"))
 }
 
 unsubscribe <- function(socket, option.value) {
-    .Call("unsubscribe",socket, option.value, PACKAGE="rzmq")
+    .Call("setSockOptChr", socket, "ZMQ_UNSUBSCRIBE", option.value, PACKAGE="rzmq")
 }
 
 set.rate <- function(socket, option.value) {
-    .Call("set_rate",socket, option.value, PACKAGE="rzmq")
+    .Call("setSockOptInt", socket, "ZMQ_RATE", option.value, PACKAGE="rzmq")
 }
 
 set.recovery.ivl <- function(socket, option.value) {
-    .Call("set_recovery_ivl",socket, option.value, PACKAGE="rzmq")
+    .Call("setSockOptInt", socket, "ZMQ_RECOVERY_IVL", option.value, PACKAGE="rzmq")
 }
 
 set.sndbuf <- function(socket, option.value) {
-    .Call("set_sndbuf",socket, option.value, PACKAGE="rzmq")
+    .Call("setSockOptInt",socket, "ZMQ_SNDBUF", option.value, PACKAGE="rzmq")
 }
 
 set.rcvbuf <- function(socket, option.value) {
-    .Call("set_rcvbuf",socket, option.value, PACKAGE="rzmq")
+    .Call("setSockOptInt",socket, "ZMQ_RCVBUF", option.value, PACKAGE="rzmq")
 }
 
 set.linger <- function(socket, option.value) {
-    .Call("set_linger",socket, option.value, PACKAGE="rzmq")
+    .Call("setSockOptInt", socket, "ZMQ_LINGER", option.value, PACKAGE="rzmq")
 }
 
 set.reconnect.ivl <- function(socket, option.value) {
-    .Call("set_reconnect_ivl",socket, option.value, PACKAGE="rzmq")
+    .Call("setSockOptInt", socket, "ZMQ_RECONNECT_IVL", option.value, PACKAGE="rzmq")
 }
 
 set.zmq.backlog <- function(socket, option.value) {
-    .Call("set_zmq_backlog",socket, option.value, PACKAGE="rzmq")
+    .Call("setSockOptInt", socket, "ZMQ_BACKLOG", option.value, PACKAGE="rzmq")
 }
 
 set.reconnect.ivl.max <- function(socket, option.value) {
-    .Call("set_reconnect_ivl_max",socket, option.value, PACKAGE="rzmq")
+    .Call("setSockOptInt", socket, "ZMQ_RECONNECT_IVL_MAX", option.value, PACKAGE="rzmq")
 }
 
 get.rcvmore <- function(socket) {
-    .Call("get_rcvmore",socket,PACKAGE="rzmq")
+    .Call("get_rcvmore", socket, PACKAGE="rzmq")
 }
 
 set.send.timeout <- function(socket, option.value) {
-    .Call("set_sndtimeo", socket, option.value, PACKAGE="rzmq")
+    .Call("setSockOptInt", socket, "ZMQ_SNDTIMEO", option.value, PACKAGE="rzmq")
 }
 
 get.send.timeout <- function(socket) {
