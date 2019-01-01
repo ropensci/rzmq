@@ -119,6 +119,10 @@ int string_to_option_type(const std::string s) {
     return ZMQ_RECONNECT_IVL_MAX;
   } else if (s == "ZMQ_SNDTIMEO") {
     return ZMQ_SNDTIMEO;
+  } else if (s == "ZMQ_SNDHWM") {
+    return ZMQ_SNDHWM;
+  } else if (s == "ZMQ_RCVHWM") {
+    return ZMQ_RCVHWM;
   } else {
     return -1;
   }

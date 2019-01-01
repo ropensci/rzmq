@@ -179,3 +179,11 @@ set.send.timeout <- function(socket, option.value) {
 get.send.timeout <- function(socket) {
     .Call("get_sndtimeo", socket, PACKAGE="rzmq")
 }
+
+set.send.hwm <- function(socket, option.value) {
+    .Call("setSockOptInt", socket, "ZMQ_SNDHWM", option.value, PACKAGE="rzmq")
+}
+
+set.rcv.hwm <- function(socket, option.value) {
+    .Call("setSockOptInt", socket, "ZMQ_RCVHWM", option.value, PACKAGE="rzmq")
+}

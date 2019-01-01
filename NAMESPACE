@@ -35,5 +35,7 @@ export(zmq.version,
        set.reconnect.ivl.max,
        get.rcvmore,
        set.send.timeout,
-       get.send.timeout
+       get.send.timeout,
+       set.send.hwm,
+       set.rcv.hwm
        )

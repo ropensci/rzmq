@@ -14,6 +14,8 @@
 \alias{get.rcvmore}
 \alias{get.send.timeout}
 \alias{set.send.timeout}
+\alias{set.send.hwm}
+\alias{set.rcv.hwm}
 
 \title{
   set a socket option.
@@ -40,6 +42,8 @@ set.reconnect.ivl.max(socket, option.value)
 get.rcvmore(socket)
 get.send.timeout(socket)
 set.send.timeout(socket, option.value)
+set.send.hwm(socket, option.value)
+set.rcv.hwm(socket, option.value)
 
 }
 
@@ -71,5 +75,6 @@ context = init.context()
 socket = init.socket(context,"ZMQ_REQ")
 
 set.identity(socket, "big.ass.socket")
+set.send.hwm(socket, 1L)
 }}
 \keyword{utilities}
