@@ -7,8 +7,8 @@ PKG_CPPFLAGS = -DZMQ_STATIC \
 	-I${ZEROMQ}/include -I../inst
 	
 PKG_LIBS = \
-	-L${ZEROMQ}/lib${R_ARCH} \
 	-L${ZEROMQ}/lib${GCC_VERSION}${R_ARCH} \
+	-L${ZEROMQ}/lib${R_ARCH} \
 	-lzmq -lsodium -liphlpapi -lws2_32
 
 all: clean winlibs
