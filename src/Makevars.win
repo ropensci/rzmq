@@ -1,14 +1,13 @@
 CXX_STD = CXX11
-COMPILED_BY ?= gcc-4.6.3
 GCC_VERSION = ${subst gcc,,${COMPILED_BY}}
-ZEROMQ = ../windows/zeromq-4.2.1
+RWINLIB = ../windows/zeromq-4.2.1
 
 PKG_CPPFLAGS = -DZMQ_STATIC \
-	-I${ZEROMQ}/include -I../inst
+	-I${RWINLIB}/include -I../inst
 	
 PKG_LIBS = \
-	-L${ZEROMQ}/lib${GCC_VERSION}${R_ARCH} \
-	-L${ZEROMQ}/lib${R_ARCH} \
+	-L${RWINLIB}/lib${GCC_VERSION}${R_ARCH} \
+	-L${RWINLIB}/lib${R_ARCH} \
 	-lzmq -lsodium -liphlpapi -lws2_32
 
 all: clean winlibs
