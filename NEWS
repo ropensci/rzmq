@@ -1,3 +1,6 @@
+0.9.5
+  - allow sending of long vectors (#47)
+  
 0.9.4
   - Catching signals and interrupts when polling (Michael Schubert #46) 
   
