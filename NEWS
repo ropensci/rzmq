@@ -1,3 +1,6 @@
+0.9.6
+  - Fix some rchk warnings
+  
 0.9.5
   - allow sending of long vectors (#47)
   
