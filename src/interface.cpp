@@ -292,8 +292,6 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
         } while(rc < 0);
 
         for (int i = 0; i < nsock; i++) {
-            SEXP events, names;
-
             // Pre count number of polled events so we can
             // allocate appropriately sized lists.
             short eventcount = 0;
@@ -301,8 +299,8 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
             if (pitems[i].events & ZMQ_POLLOUT) eventcount++;
             if (pitems[i].events & ZMQ_POLLERR) eventcount++;
 
-            PROTECT(events = allocVector(VECSXP, eventcount));
-            PROTECT(names = allocVector(VECSXP, eventcount));
+            SEXP events = PROTECT(allocVector(VECSXP, eventcount));
+            SEXP names = PROTECT(allocVector(VECSXP, eventcount));
 
             eventcount = 0;
             if (pitems[i].events & ZMQ_POLLIN) {
@@ -324,11 +322,12 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
             }
             setAttrib(events, R_NamesSymbol, names);
             SET_VECTOR_ELT(result, i, events);
+            UNPROTECT(2);
         }
 
         // Release the result list (1), and per socket
         // events lists with associated names (2*nsock).
-        UNPROTECT(1 + 2*nsock);
+        UNPROTECT(1);
         return result;
     } catch(zmq::error_t& e) {
         if (errno == ETERM) {
@@ -562,7 +561,7 @@ SEXP receiveSocket(SEXP socket_, SEXP dont_wait_) {
   }
   if(!success)
     return R_NilValue;
-  SEXP ans = PROTECT(allocVector(RAWSXP,msg.size()));
+  SEXP ans = allocVector(RAWSXP,msg.size());
   memcpy(RAW(ans),msg.data(),msg.size());
   return ans;
 }
