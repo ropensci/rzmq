@@ -292,8 +292,6 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
         } while(rc < 0);
 
         for (int i = 0; i < nsock; i++) {
-            SEXP events, names;
-
             // Pre count number of polled events so we can
             // allocate appropriately sized lists.
             short eventcount = 0;
@@ -301,8 +299,8 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
             if (pitems[i].events & ZMQ_POLLOUT) eventcount++;
             if (pitems[i].events & ZMQ_POLLERR) eventcount++;
 
-            PROTECT(events = allocVector(VECSXP, eventcount));
-            PROTECT(names = allocVector(VECSXP, eventcount));
+            SEXP events = PROTECT(allocVector(VECSXP, eventcount));
+            SEXP names = PROTECT(allocVector(VECSXP, eventcount));
 
             eventcount = 0;
             if (pitems[i].events & ZMQ_POLLIN) {
@@ -324,11 +322,12 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
             }
             setAttrib(events, R_NamesSymbol, names);
             SET_VECTOR_ELT(result, i, events);
+            UNPROTECT(2);
         }
 
         // Release the result list (1), and per socket
         // events lists with associated names (2*nsock).
-        UNPROTECT(1 + 2*nsock);
+        UNPROTECT(1);
         return result;
     } catch(zmq::error_t& e) {
         if (errno == ETERM) {
@@ -402,7 +401,11 @@ SEXP sendSocket(SEXP socket_, SEXP data_, SEXP send_more_) {
   }
 
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
-  if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
+  if(!socket) { 
+    UNPROTECT(1);
+    REprintf("bad socket object.\n");
+    return R_NilValue;
+  }
 
   zmq::message_t msg (Rf_xlength(data_));
   memcpy(msg.data(), RAW(data_), Rf_xlength(data_));
@@ -433,7 +436,11 @@ SEXP sendNullMsg(SEXP socket_, SEXP send_more_) {
   }
 
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
-  if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
+  if(!socket) { 
+    REprintf("bad socket object.\n");
+    UNPROTECT(1);
+    return R_NilValue; 
+  }
   zmq::message_t msg(0);
 
   bool send_more = LOGICAL(send_more_)[0];
@@ -456,7 +463,6 @@ SEXP initMessage(SEXP data_) {
 
   if(TYPEOF(data_) != RAWSXP) {
     REprintf("data type must be raw (RAWSXP).\n");
-    UNPROTECT(1);
     return R_NilValue;
   }
 
@@ -477,17 +483,26 @@ SEXP sendMessageObject(SEXP socket_, SEXP msg_, SEXP send_more_) {
 
   if(TYPEOF(send_more_) != LGLSXP) {
     REprintf("send.more type must be logical (LGLSXP).\n");
+    UNPROTECT(1);
     return R_NilValue;
   }
 
   zmq::message_t* msg = reinterpret_cast<zmq::message_t*>(checkExternalPointer(msg_,"zmq::message_t*"));
-  if(!msg) { REprintf("bad message object.\n");return R_NilValue; }
+  if(!msg) { 
+    REprintf("bad message object.\n");
+    UNPROTECT(1);
+    return R_NilValue; 
+  }
 
   zmq::message_t copy;
   copy.copy(msg);
 
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
-  if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
+  if(!socket) { 
+    REprintf("bad socket object.\n");
+    UNPROTECT(1);
+    return R_NilValue;
+  }
 
   bool send_more = LOGICAL(send_more_)[0];
   try {
@@ -509,7 +524,11 @@ SEXP receiveNullMsg(SEXP socket_) {
   bool status(false);
 
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
-  if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
+  if(!socket) { 
+    REprintf("bad socket object.\n");
+    UNPROTECT(1);
+    return R_NilValue;
+  }
   zmq::message_t msg;
   try {
     status = socket->recv(&msg);
@@ -522,7 +541,6 @@ SEXP receiveNullMsg(SEXP socket_) {
 }
 
 SEXP receiveSocket(SEXP socket_, SEXP dont_wait_) {
-  SEXP ans;
   zmq::message_t msg;
 
   if(TYPEOF(dont_wait_) != LGLSXP) {
@@ -531,25 +549,22 @@ SEXP receiveSocket(SEXP socket_, SEXP dont_wait_) {
   }
   int flags = LOGICAL(dont_wait_)[0];
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
-  if(!socket) { REprintf("bad socket object.\n"); return R_NilValue; }
+  if(!socket) { 
+    REprintf("bad socket object.\n"); 
+    return R_NilValue;
+  }
+  int success = 0;
   try {
-    if(socket->recv(&msg, flags)) {
-      PROTECT(ans = allocVector(RAWSXP,msg.size()));
-      memcpy(RAW(ans),msg.data(),msg.size());
-      UNPROTECT(1);
-      return ans;
-    } else {
-      // socket->recv returned false, but did not throw
-      // this condition implies EAGAIN
-      // see here for logic: https://github.com/zeromq/cppzmq/blob/master/zmq.hpp#L449
-      return R_NilValue;
-    }
+    success = socket->recv(&msg, flags);
   } catch(std::exception& e) {
     REprintf("%s\n",e.what());
   }
-  return R_NilValue;
+  if(!success)
+    return R_NilValue;
+  SEXP ans = allocVector(RAWSXP,msg.size());
+  memcpy(RAW(ans),msg.data(),msg.size());
+  return ans;
 }
-
 
 SEXP sendRawString(SEXP socket_, SEXP data_, SEXP send_more_) {
   SEXP ans;
