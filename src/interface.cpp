@@ -542,7 +542,6 @@ SEXP receiveNullMsg(SEXP socket_) {
 }
 
 SEXP receiveSocket(SEXP socket_, SEXP dont_wait_) {
-  SEXP ans = R_NilValue;
   zmq::message_t msg;
 
   if(TYPEOF(dont_wait_) != LGLSXP) {
@@ -555,14 +554,16 @@ SEXP receiveSocket(SEXP socket_, SEXP dont_wait_) {
     REprintf("bad socket object.\n"); 
     return R_NilValue;
   }
+  int success = 0;
   try {
-    if(socket->recv(&msg, flags)) {
-      ans = allocVector(RAWSXP,msg.size());
-      memcpy(RAW(ans),msg.data(),msg.size());
-    }
+    success = socket->recv(&msg, flags);
   } catch(std::exception& e) {
     REprintf("%s\n",e.what());
   }
+  if(!success)
+    return R_NilValue;
+  SEXP ans = PROTECT(allocVector(RAWSXP,msg.size()));
+  memcpy(RAW(ans),msg.data(),msg.size());
   return ans;
 }
 
