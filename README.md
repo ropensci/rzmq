@@ -1,21 +1,23 @@
-## rzmq 
+# rzmq
+
+> R Bindings for 'ZeroMQ'
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![Build Status](https://travis-ci.org/ropensci/rzmq.svg)](https://travis-ci.org/ropensci/rzmq)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/ropensci/rzmq?branch=master)](https://ci.appveyor.com/project/jeroen/rzmq)
 [![Package-License](http://img.shields.io/badge/license-GPL--3-brightgreen.svg?style=flat)](http://www.gnu.org/licenses/gpl-3.0.html) [![CRAN](http://www.r-pkg.org/badges/version/rzmq)](https://cran.r-project.org/package=rzmq) [![Downloads](http://cranlogs.r-pkg.org/badges/rzmq?color=brightgreen)](http://www.r-pkg.org/pkg/rzmq)
 
-### Purpose
+Interface to the 'ZeroMQ' lightweight messaging kernel (see <http://www.zeromq.org/> for more information).
 
-rzmq is an R binding for [ZMQ](http://www.zeromq.org/).
 
-### Features
+## Features
+
 rzmq is a message queue for serialized R objects.
 * rzmq implements most the standard socket pairs that ZMQ offers.
 * ZMQ devices are not implemented yet, nor is zmq_poll.
 * Look for more features shortly.
 
-### Installation
+## Installation
 
 Binary packages for __OS-X__ or __Windows__ can be installed directly from CRAN:
 
@@ -23,7 +25,7 @@ Binary packages for __OS-X__ or __Windows__ can be installed directly from CRAN:
 install.packages("rzmq")
 ```
 
-#### Build from source
+## Build from source
 
 Installation from source requires [`ZeroMQ`](http://zeromq.org/area:download). On __Debian__ or __Ubuntu__ use [libzmq3-dev](https://packages.debian.org/testing/libzmq3-dev):
 
@@ -51,7 +53,7 @@ brew install zeromq
 ```
 
 
-### Usage
+## Usage
 
 A minimal example of remote execution.
 
