@@ -9,6 +9,6 @@ Description: Interface to the 'ZeroMQ' lightweight messaging kernel (see <http:/
 License: GPL-3
 Depends: R (>= 3.1.0)
 SystemRequirements: ZeroMQ >= 3.0.0: libzmq3-dev (deb) or zeromq-devel (rpm)
-URL: http://github.com/ropensci/rzmq#readme (devel) 
+URL: https://docs.ropensci.org/rzmq,  http://github.com/ropensci/rzmq#readme (devel) 
     http://www.zeromq.org (upstream)
 BugReports: http://github.com/ropensci/rzmq/issues
