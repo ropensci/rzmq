@@ -16,6 +16,7 @@
 \alias{set.zmq.backlog}
 \alias{set.reconnect.ivl.max}
 \alias{get.rcvmore}
+\alias{get.last.endpoint}
 \alias{get.send.timeout}
 \alias{set.send.timeout}
 
@@ -46,6 +47,7 @@ set.reconnect.ivl(socket, option.value)
 set.zmq.backlog(socket, option.value)
 set.reconnect.ivl.max(socket, option.value)
 get.rcvmore(socket)
+get.last.endpoint(socket)
 get.send.timeout(socket)
 set.send.timeout(socket, option.value)
 
