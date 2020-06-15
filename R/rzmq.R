@@ -204,6 +204,10 @@ get.rcvmore <- function(socket) {
     .Call("get_rcvmore",socket,PACKAGE="rzmq")
 }
 
+get.last.endpoint <- function(socket) {
+    .Call("get_last_endpoint", socket, PACKAGE="rzmq")
+}
+
 set.send.timeout <- function(socket, option.value) {
     .Call("set_sndtimeo", socket, option.value, PACKAGE="rzmq")
 }

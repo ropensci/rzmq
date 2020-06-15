@@ -1017,6 +1017,24 @@ SEXP set_sndtimeo(SEXP socket_, SEXP option_value_) {
   return ans;
 }
 
+SEXP get_last_endpoint(SEXP socket_) {
+
+  zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
+  if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
+  char option_value[1024];
+  size_t option_value_len = sizeof(option_value);
+  try {
+    socket->getsockopt(ZMQ_LAST_ENDPOINT, option_value, &option_value_len);
+  } catch(std::exception& e) {
+    REprintf("%s\n",e.what());
+    return R_NilValue;
+  }
+  SEXP ans; PROTECT(ans = allocVector(STRSXP,1));
+  SET_STRING_ELT(ans, 0, mkChar(option_value));
+  UNPROTECT(1);
+  return ans;
+}
+
 SEXP get_sndtimeo(SEXP socket_) {
 
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
