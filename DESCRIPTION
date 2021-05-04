@@ -6,10 +6,9 @@ Authors@R: c(
     person("Michael", "Schubert", role = "ctb"),
     person("Jeroen", "Ooms", , "jeroen@berkeley.edu", role = c("aut", "cre"),
       comment = c(ORCID = "0000-0002-4035-0289")))
-Description: Interface to the 'ZeroMQ' lightweight messaging kernel (see <http://www.zeromq.org/> for more information).
+Description: Interface to the 'ZeroMQ' lightweight messaging kernel (see <https://zeromq.org/> for more information).
 License: GPL-3
 Depends: R (>= 3.1.0)
 SystemRequirements: ZeroMQ >= 3.0.0: libzmq3-dev (deb) or zeromq-devel (rpm)
-URL: https://docs.ropensci.org/rzmq,  http://github.com/ropensci/rzmq#readme (devel) 
-    http://www.zeromq.org (upstream)
-BugReports: http://github.com/ropensci/rzmq/issues
+URL: https://docs.ropensci.org/rzmq/
+BugReports: https://github.com/ropensci/rzmq/issues
