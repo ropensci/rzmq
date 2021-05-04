@@ -3,7 +3,6 @@
 > R Bindings for 'ZeroMQ'
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![Build Status](https://travis-ci.org/ropensci/rzmq.svg)](https://travis-ci.org/ropensci/rzmq)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/ropensci/rzmq?branch=master)](https://ci.appveyor.com/project/jeroen/rzmq)
 [![Package-License](http://img.shields.io/badge/license-GPL--3-brightgreen.svg?style=flat)](http://www.gnu.org/licenses/gpl-3.0.html) [![CRAN](http://www.r-pkg.org/badges/version/rzmq)](https://cran.r-project.org/package=rzmq) [![Downloads](http://cranlogs.r-pkg.org/badges/rzmq?color=brightgreen)](http://www.r-pkg.org/pkg/rzmq)
 
