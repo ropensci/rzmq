@@ -9,3 +9,4 @@
 ^appveyor\.yml$
 ^configure.log$
 ^\.github$
+README.md
