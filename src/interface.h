@@ -50,6 +50,7 @@ extern "C" {
   SEXP set_hwm(SEXP socket_, SEXP option_value_);
   SEXP set_swap(SEXP socket_, SEXP option_value_);
   SEXP set_affinity(SEXP socket_, SEXP option_value_);
+  SEXP set_conflate(SEXP socket_, SEXP option_value_);
   SEXP set_identity(SEXP socket_, SEXP option_value_);
   SEXP subscribe(SEXP socket_, SEXP option_value_);
   SEXP unsubscribe(SEXP socket_, SEXP option_value_);
