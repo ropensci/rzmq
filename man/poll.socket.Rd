@@ -37,7 +37,7 @@ in.socket = init.socket(context,"ZMQ_REP")
 bind.socket(in.socket,"tcp://*:5557")
 
 out.socket = init.socket(context,"ZMQ_REQ")
-connect.socket(out.socket,"tcp://*:5557")
+connect.socket(out.socket,"tcp://localhost:5557")
 
 # Poll the REP and REQ sockets for all events.
 events <- poll.socket(list(in.socket, out.socket),
