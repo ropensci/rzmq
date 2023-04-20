@@ -119,6 +119,8 @@ int string_to_option_type(const std::string s) {
     return ZMQ_RECONNECT_IVL_MAX;
   } else if (s == "ZMQ_SNDTIMEO") {
     return ZMQ_SNDTIMEO;
+  } else if (s == "ZMQ_RCVTIMEO") {
+    return ZMQ_RCVTIMEO;
   } else if (s == "ZMQ_SNDHWM") {
     return ZMQ_SNDHWM;
   } else if (s == "ZMQ_RCVHWM") {
@@ -802,6 +804,24 @@ SEXP get_sndtimeo(SEXP socket_) {
   size_t option_value_len = sizeof(option_value);
   try {
     socket->getsockopt(ZMQ_SNDTIMEO, &option_value, &option_value_len);
+  } catch(std::exception& e) {
+    REprintf("%s\n",e.what());
+    return R_NilValue;
+  }
+  SEXP ans; PROTECT(ans = allocVector(REALSXP,1));
+  REAL(ans)[0] = static_cast<int>(option_value);
+  UNPROTECT(1);
+  return ans;
+}
+
+SEXP get_rcvtimeo(SEXP socket_) {
+  
+  zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
+  if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
+  int option_value;
+  size_t option_value_len = sizeof(option_value);
+  try {
+    socket->getsockopt(ZMQ_RCVTIMEO, &option_value, &option_value_len);
   } catch(std::exception& e) {
     REprintf("%s\n",e.what());
     return R_NilValue;

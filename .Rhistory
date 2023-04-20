@@ -1,0 +1,2 @@
+devtools::document()
+devtools::build()
