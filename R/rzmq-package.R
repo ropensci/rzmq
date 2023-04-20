@@ -14,6 +14,11 @@
 ## You should have received a copy of the GNU General Public License     ##
 ## along with this program.  If not, see <http:##www.gnu.org#licenses#>. ##
 ###########################################################################
+
+## usethis namespace: start
+#' @useDynLib rzmq, .registration = TRUE
+## usethis namespace: end
+NULL
  
 #' Get the ZMQ version.
 #' 
@@ -249,7 +254,7 @@ receive.socket <- function(socket, unserialize=TRUE, dont.wait=FALSE) {
 
 #' Receive a multipart message.
 #'
-#' @param socket 
+#' @param socket Socket.
 #'
 #' @return List of message parts. Parts are unserialized.
 #' @export
@@ -312,7 +317,7 @@ send.raw.string <- function(socket, data, send.more=FALSE) {
 #'
 #' @param socket Socket.
 #'
-#' @return Recieved message as a string.
+#' @return Received message as a string.
 #' @export
 #'
 #' @examples
@@ -429,6 +434,10 @@ receive.double <- function(socket) {
 #' # Complete the REP-REQ transaction cycle by reading
 #' # the REP response.
 #' receive.socket(out.socket)
+poll.socket <- function(sockets, events, timeout=0L) {
+  if (timeout != -1L) timeout <- as.integer(timeout * 1e3)
+  .Call("pollSocket", sockets, events, timeout)
+}
 
 #' Set the I/O thread affinity for newly created connections of the socket.
 #' See ZMQ socket option `ZMQ_AFFINITY`.
