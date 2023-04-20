@@ -1,14 +1,10 @@
 \name{socket.options}
-\alias{set.hwm}
-\alias{set.swap}
 \alias{set.affinity}
 \alias{set.identity}
 \alias{subscribe}
 \alias{unsubscribe}
 \alias{set.rate}
 \alias{set.recovery.ivl}
-\alias{set.recovery.ivl.msec}
-\alias{set.mcast.loop}
 \alias{set.sndbuf}
 \alias{set.rcvbuf}
 \alias{set.linger}
@@ -19,6 +15,8 @@
 \alias{get.last.endpoint}
 \alias{get.send.timeout}
 \alias{set.send.timeout}
+\alias{set.send.hwm}
+\alias{set.rcv.hwm}
 
 \title{
   set a socket option.
@@ -30,16 +28,12 @@ option_name argument to the value pointed to by the option_value
 argument for the ZMQ socket pointed to by the socket argument.
 }
 \usage{
-set.hwm(socket, option.value)
-set.swap(socket, option.value)
 set.affinity(socket, option.value)
 set.identity(socket, option.value)
 subscribe(socket, option.value)
 unsubscribe(socket, option.value)
 set.rate(socket, option.value)
 set.recovery.ivl(socket, option.value)
-set.recovery.ivl.msec(socket, option.value)
-set.mcast.loop(socket, option.value)
 set.sndbuf(socket, option.value)
 set.rcvbuf(socket, option.value)
 set.linger(socket, option.value)
@@ -50,6 +44,8 @@ get.rcvmore(socket)
 get.last.endpoint(socket)
 get.send.timeout(socket)
 set.send.timeout(socket, option.value)
+set.send.hwm(socket, option.value)
+set.rcv.hwm(socket, option.value)
 
 }
 
@@ -80,8 +76,7 @@ library(rzmq)
 context = init.context()
 socket = init.socket(context,"ZMQ_REQ")
 
-set.hwm(socket, 1L)
-set.swap(socket, 100L)
 set.identity(socket, "big.ass.socket")
+set.send.hwm(socket, 1L)
 }}
 \keyword{utilities}
