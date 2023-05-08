@@ -220,6 +220,6 @@ set.rcv.timeout <- function(socket, option.value) {
     .Call("set_rcvtimeo", socket, option.value, PACKAGE="rzmq")
 }
 
-get.rcv.timout <- function(socket) {
+get.rcv.timeout <- function(socket) {
     .Call("get_rcvtimeo", socket, PACKAGE="rzmq")
 }
