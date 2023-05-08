@@ -1,15 +1,14 @@
-CXX_STD = CXX11
 GCC_VERSION = ${subst gcc,,${COMPILED_BY}}
 RWINLIB = ../windows/zeromq-4.3.4
 
-PKG_CXXFLAGS = -Wno-deprecated-declarations
+#PKG_CXXFLAGS = -Wno-deprecated-declarations
 
 PKG_CPPFLAGS = -DZMQ_STATIC \
 	-I${RWINLIB}/include -I../inst
 	
 PKG_LIBS = \
 	-L${RWINLIB}/lib${GCC_VERSION}${R_ARCH} \
-	-L${RWINLIB}/lib${R_ARCH}${CRT} \
+	-L${RWINLIB}/lib${R_ARCH} \
 	-lzmq -lsodium -liphlpapi -lws2_32
 
 all: clean winlibs
