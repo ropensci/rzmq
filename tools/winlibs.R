@@ -1,8 +1,11 @@
 # Build against precompiled zeromq libs.
 if(!file.exists("../windows/zeromq-4.3.4/include/zmq.h")){
   if(getRversion() < "3.3.0") setInternet2()
-  download.file("https://github.com/rwinlib/zeromq/archive/v4.3.4.zip", "lib.zip", quiet = TRUE)
+  download.file("https://github.com/rwinlib/zeromq/archive/4.3.4.zip", "lib.zip", quiet = TRUE)
   dir.create("../windows", showWarnings = FALSE)
   unzip("lib.zip", exdir = "../windows")
   unlink("lib.zip")
+  
+  # We want to use vendored zmq.hpp from rzmq instead
+  unlink("../windows/zeromq-4.3.4/include/*.hpp")
 }
