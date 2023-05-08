@@ -19,6 +19,8 @@
 \alias{get.last.endpoint}
 \alias{get.send.timeout}
 \alias{set.send.timeout}
+\alias{get.rcv.timeout}
+\alias{set.rcv.timeout}
 
 \title{
   set a socket option.
@@ -50,7 +52,8 @@ get.rcvmore(socket)
 get.last.endpoint(socket)
 get.send.timeout(socket)
 set.send.timeout(socket, option.value)
-
+get.rcv.timeout(socket)
+set.rcv.timeout(socket, option.value)
 }
 
 \arguments{
