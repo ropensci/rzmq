@@ -1,10 +1,8 @@
 GCC_VERSION = ${subst gcc,,${COMPILED_BY}}
 RWINLIB = ../windows/zeromq-4.3.4
 
-#PKG_CXXFLAGS = -Wno-deprecated-declarations
-
 PKG_CPPFLAGS = -DZMQ_STATIC \
-	-I${RWINLIB}/include -I../inst
+	-I../inst -I${RWINLIB}/include
 	
 PKG_LIBS = \
 	-L${RWINLIB}/lib${GCC_VERSION}${R_ARCH} \
