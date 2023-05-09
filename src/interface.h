@@ -68,6 +68,9 @@ extern "C" {
   SEXP get_last_endpoint(SEXP socket_);
   SEXP get_sndtimeo(SEXP socket_);
   SEXP set_sndtimeo(SEXP socket_, SEXP option_value_);
+  SEXP get_rcvtimeo(SEXP socket_);
+  SEXP set_rcvtimeo(SEXP socket_, SEXP option_value_);
+  
 }
 
 #endif // INTERFACE_HPP
