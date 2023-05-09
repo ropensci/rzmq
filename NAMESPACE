@@ -40,5 +40,7 @@ export(zmq.version,
        get.rcvmore,
        get.last.endpoint,
        set.send.timeout,
-       get.send.timeout
+       get.send.timeout,
+       set.rcv.timeout,
+       get.rcv.timeout
        )

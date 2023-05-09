@@ -215,3 +215,11 @@ set.send.timeout <- function(socket, option.value) {
 get.send.timeout <- function(socket) {
     .Call("get_sndtimeo", socket, PACKAGE="rzmq")
 }
+
+set.rcv.timeout <- function(socket, option.value) {
+    .Call("set_rcvtimeo", socket, option.value, PACKAGE="rzmq")
+}
+
+get.rcv.timeout <- function(socket) {
+    .Call("get_rcvtimeo", socket, PACKAGE="rzmq")
+}
