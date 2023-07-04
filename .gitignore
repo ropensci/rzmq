@@ -9,3 +9,6 @@
 src/Makevars
 windows
 configure.log
+.Rdata
+.Rhistory
+.Rproj.user
