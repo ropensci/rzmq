@@ -1,3 +1,6 @@
+0.9.10
+  - Windows: support arm64
+  
 0.9.8
   - Windows: update to zermoq 4.3.4
 
