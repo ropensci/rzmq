@@ -19,8 +19,7 @@ init.socket(context, socket.type)
     e.g. ZMQ_REQ,ZMQ_REP,ZMQ_PULL,ZMQ_PUSH, etc.}
 }
 \value{
-  \code{init.context}{ returns a zmq context object.}
-  \code{init.socket}{returns a zmq socket object.}
+  \code{init.context} returns a zmq context object. \code{init.socket} returns a zmq socket object.
 }
 \references{
   http://www.zeromq.org
