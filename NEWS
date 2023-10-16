@@ -1,3 +1,6 @@
+0.9.11
+  - Windows: fix pthread linking
+
 0.9.10
   - Windows: support arm64
   
