@@ -722,6 +722,25 @@ SEXP set_swap(SEXP socket_, SEXP option_value_) {
 }
 #endif
 
+SEXP set_conflate(SEXP socket_, SEXP option_value_) {
+
+  zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
+  if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
+  if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
+  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+
+  uint64_t option_value(INTEGER(option_value_)[0]);
+  try {
+    socket->setsockopt(ZMQ_CONFLATE, &option_value, sizeof(uint64_t));
+  } catch(std::exception& e) {
+    REprintf("%s\n",e.what());
+    LOGICAL(ans)[0] = 0;
+  }
+  UNPROTECT(1);
+  return ans;
+}
+
+
 SEXP set_affinity(SEXP socket_, SEXP option_value_) {
 
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
