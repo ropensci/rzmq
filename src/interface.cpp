@@ -341,7 +341,7 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
         } else
             throw e;
     } catch(std::exception& e) {
-        error(e.what());
+        error("%s", e.what());
     }
 }
 
