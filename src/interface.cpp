@@ -40,22 +40,22 @@ SEXP get_zmq_version() {
   std::stringstream out;
   zmq::version(&major, &minor, &patch);
   out << major << "." << minor << "." << patch;
-  PROTECT(ans = allocVector(STRSXP,1));
-  SET_STRING_ELT(ans, 0, mkChar(out.str().c_str()));
+  PROTECT(ans = Rf_allocVector(STRSXP,1));
+  SET_STRING_ELT(ans, 0, Rf_mkChar(out.str().c_str()));
   UNPROTECT(1);
   return ans;
 }
 
 SEXP get_zmq_errno() {
-  SEXP ans; PROTECT(ans = allocVector(INTSXP,1));
+  SEXP ans; PROTECT(ans = Rf_allocVector(INTSXP,1));
   INTEGER(ans)[0] = zmq_errno();
   UNPROTECT(1);
   return ans;
 }
 
 SEXP get_zmq_strerror() {
-  SEXP ans; PROTECT(ans = allocVector(STRSXP,1));
-  SET_STRING_ELT(ans, 0, mkChar(zmq_strerror(zmq_errno())));
+  SEXP ans; PROTECT(ans = Rf_allocVector(STRSXP,1));
+  SET_STRING_ELT(ans, 0, Rf_mkChar(zmq_strerror(zmq_errno())));
   UNPROTECT(1);
   return ans;
 }
@@ -142,7 +142,7 @@ static void messageFinalizer(SEXP msg_) {
 
 SEXP initContext(SEXP threads_) {
   if(TYPEOF(threads_) != INTSXP) {
-    error("thread number must be an integer.");
+    Rf_error("thread number must be an integer.");
   }
 
   SEXP context_;
@@ -155,7 +155,7 @@ SEXP initContext(SEXP threads_) {
   }
 
   if(context) {
-    PROTECT(context_ = R_MakeExternalPtr(reinterpret_cast<void*>(context),install("zmq::context_t*"),R_NilValue));
+    PROTECT(context_ = R_MakeExternalPtr(reinterpret_cast<void*>(context),Rf_install("zmq::context_t*"),R_NilValue));
     R_RegisterCFinalizerEx(context_, contextFinalizer, TRUE);
     UNPROTECT(1);
     return context_;
@@ -192,14 +192,14 @@ SEXP initSocket(SEXP context_, SEXP socket_type_) {
   //uint64_t hwm = 1;
   //socket->setsockopt(ZMQ_HWM, &hwm, sizeof (hwm));
 
-  PROTECT(socket_ = R_MakeExternalPtr(reinterpret_cast<void*>(socket),install("zmq::socket_t*"),R_NilValue));
+  PROTECT(socket_ = R_MakeExternalPtr(reinterpret_cast<void*>(socket),Rf_install("zmq::socket_t*"),R_NilValue));
   R_RegisterCFinalizerEx(socket_, socketFinalizer, TRUE);
   UNPROTECT(1);
   return socket_;
 }
 
 SEXP bindSocket(SEXP socket_, SEXP address_) {
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 
   if(TYPEOF(address_) != STRSXP) {
     REprintf("address type must be a string.\n");
@@ -223,7 +223,7 @@ static short rzmq_build_event_bitmask(SEXP askevents) {
     short bitmask = 0;
     if(TYPEOF(askevents) == STRSXP) {
         for (int i = 0; i < LENGTH(askevents); i++) {
-            const char *ask = translateChar(STRING_ELT(askevents, i));
+            const char *ask = Rf_translateChar(STRING_ELT(askevents, i));
             if (strcmp(ask, "read") == 0) {
                 bitmask |= ZMQ_POLLIN;
             } else if (strcmp(ask, "write") == 0) {
@@ -231,11 +231,11 @@ static short rzmq_build_event_bitmask(SEXP askevents) {
             } else if (strcmp(ask, "error") == 0) {
                 bitmask |= ZMQ_POLLERR;
             } else {
-                error("unrecognized requests poll event %s.", ask);
+                Rf_error("unrecognized requests poll event %s.", ask);
             }
         }
     } else {
-        error("event list passed to poll must be a string or vector of strings");
+        Rf_error("event list passed to poll must be a string or vector of strings");
     }
     return bitmask;
 }
@@ -244,26 +244,26 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
     SEXP result;
 
     if(TYPEOF(timeout_) != INTSXP) {
-        error("poll timeout must be an integer.");
+        Rf_error("poll timeout must be an integer.");
     }
 
     if(TYPEOF(sockets_) != VECSXP || LENGTH(sockets_) == 0) {
-        error("A non-empy list of sockets is required as first argument.");
+        Rf_error("A non-empy list of sockets is required as first argument.");
     }
 
     int nsock = LENGTH(sockets_);
-    PROTECT(result = allocVector(VECSXP, nsock));
+    PROTECT(result = Rf_allocVector(VECSXP, nsock));
 
     if (TYPEOF(events_) != VECSXP) {
-        error("event list must be a list of strings or a list of vectors of strings.");
+        Rf_error("event list must be a list of strings or a list of vectors of strings.");
     }
     if(LENGTH(events_) != nsock) {
-        error("event list must be the same length as socket list.");
+        Rf_error("event list must be the same length as socket list.");
     }
 
     zmq_pollitem_t *pitems = (zmq_pollitem_t*)R_alloc(nsock, sizeof(zmq_pollitem_t));
     if (pitems == NULL) {
-        error("failed to allocate memory for zmq_pollitem_t array.");
+        Rf_error("failed to allocate memory for zmq_pollitem_t array.");
     }
 
     try {
@@ -299,28 +299,28 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
             if (pitems[i].events & ZMQ_POLLOUT) eventcount++;
             if (pitems[i].events & ZMQ_POLLERR) eventcount++;
 
-            SEXP events = PROTECT(allocVector(VECSXP, eventcount));
-            SEXP names = PROTECT(allocVector(VECSXP, eventcount));
+            SEXP events = PROTECT(Rf_allocVector(VECSXP, eventcount));
+            SEXP names = PROTECT(Rf_allocVector(VECSXP, eventcount));
 
             eventcount = 0;
             if (pitems[i].events & ZMQ_POLLIN) {
-                SET_VECTOR_ELT(events, eventcount, ScalarLogical(pitems[i].revents & ZMQ_POLLIN));
-                SET_VECTOR_ELT(names, eventcount, mkChar("read"));
+                SET_VECTOR_ELT(events, eventcount, Rf_ScalarLogical(pitems[i].revents & ZMQ_POLLIN));
+                SET_VECTOR_ELT(names, eventcount, Rf_mkChar("read"));
                 eventcount++;
             }
 
             if (pitems[i].events & ZMQ_POLLOUT) {
-                SET_VECTOR_ELT(names, eventcount, mkChar("write"));
+                SET_VECTOR_ELT(names, eventcount, Rf_mkChar("write"));
 
-                SET_VECTOR_ELT(events, eventcount, ScalarLogical(pitems[i].revents & ZMQ_POLLOUT));
+                SET_VECTOR_ELT(events, eventcount, Rf_ScalarLogical(pitems[i].revents & ZMQ_POLLOUT));
                 eventcount++;
             }
 
             if (pitems[i].events & ZMQ_POLLERR) {
-                SET_VECTOR_ELT(names, eventcount, mkChar("error"));
-                SET_VECTOR_ELT(events, eventcount, ScalarLogical(pitems[i].revents & ZMQ_POLLERR));
+                SET_VECTOR_ELT(names, eventcount, Rf_mkChar("error"));
+                SET_VECTOR_ELT(events, eventcount, Rf_ScalarLogical(pitems[i].revents & ZMQ_POLLERR));
             }
-            setAttrib(events, R_NamesSymbol, names);
+            Rf_setAttrib(events, R_NamesSymbol, names);
             SET_VECTOR_ELT(result, i, events);
             UNPROTECT(2);
         }
@@ -331,22 +331,22 @@ SEXP pollSocket(SEXP sockets_, SEXP events_, SEXP timeout_) {
         return result;
     } catch(zmq::error_t& e) {
         if (errno == ETERM) {
-            error("At least one of the members of the 'items' array refers to "
+            Rf_error("At least one of the members of the 'items' array refers to "
                   "a 'socket' whose associated 0MQ 'context' was terminated.");
         } else if (errno == EFAULT) {
-            error("The provided 'items' was not valid (NULL).");
+            Rf_error("The provided 'items' was not valid (NULL).");
         } else if (errno == EINTR) {
-            error("The operation was interrupted by delivery of a signal "
+            Rf_error("The operation was interrupted by delivery of a signal "
                   "before any events were available.");
         } else
             throw e;
     } catch(std::exception& e) {
-        error("%s", e.what());
+        Rf_error("%s", e.what());
     }
 }
 
 SEXP connectSocket(SEXP socket_, SEXP address_) {
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 
   if(TYPEOF(address_) != STRSXP) {
     REprintf("address type must be a string.\n");
@@ -366,7 +366,7 @@ SEXP connectSocket(SEXP socket_, SEXP address_) {
 }
 
 SEXP disconnectSocket(SEXP socket_, SEXP address_) {
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 
   if(TYPEOF(address_) != STRSXP) {
     REprintf("address type must be a string.\n");
@@ -386,7 +386,7 @@ SEXP disconnectSocket(SEXP socket_, SEXP address_) {
 }
 
 SEXP sendSocket(SEXP socket_, SEXP data_, SEXP send_more_) {
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1));
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1));
   bool status(false);
   if(TYPEOF(data_) != RAWSXP) {
     REprintf("data type must be raw (RAWSXP).\n");
@@ -426,7 +426,7 @@ SEXP sendSocket(SEXP socket_, SEXP data_, SEXP send_more_) {
 }
 
 SEXP sendNullMsg(SEXP socket_, SEXP send_more_) {
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1));
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1));
   bool status(false);
 
   if(TYPEOF(send_more_) != LGLSXP) {
@@ -471,14 +471,14 @@ SEXP initMessage(SEXP data_) {
 // no copy below, see first that one copy works
 //  zmq::message_t msg(reinterpret_cast<void*>(data_), Rf_xlength(data_), NULL);
 
-  PROTECT(msg_ = R_MakeExternalPtr(reinterpret_cast<void*>(msg),install("zmq::message_t*"),R_NilValue));
+  PROTECT(msg_ = R_MakeExternalPtr(reinterpret_cast<void*>(msg),Rf_install("zmq::message_t*"),R_NilValue));
   R_RegisterCFinalizerEx(msg_, messageFinalizer, TRUE);
   UNPROTECT(1);
   return msg_;
 }
 
 SEXP sendMessageObject(SEXP socket_, SEXP msg_, SEXP send_more_) {
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1));
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1));
   bool status(false);
 
   if(TYPEOF(send_more_) != LGLSXP) {
@@ -520,7 +520,7 @@ SEXP sendMessageObject(SEXP socket_, SEXP msg_, SEXP send_more_) {
 }
 
 SEXP receiveNullMsg(SEXP socket_) {
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1));
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1));
   bool status(false);
 
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
@@ -561,7 +561,7 @@ SEXP receiveSocket(SEXP socket_, SEXP dont_wait_) {
   }
   if(!success)
     return R_NilValue;
-  SEXP ans = allocVector(RAWSXP,msg.size());
+  SEXP ans = Rf_allocVector(RAWSXP,msg.size());
   memcpy(RAW(ans),msg.data(),msg.size());
   return ans;
 }
@@ -599,7 +599,7 @@ SEXP sendRawString(SEXP socket_, SEXP data_, SEXP send_more_) {
   } catch(std::exception& e) {
     REprintf("%s\n",e.what());
   }
-  PROTECT(ans = allocVector(LGLSXP,1));
+  PROTECT(ans = Rf_allocVector(LGLSXP,1));
   LOGICAL(ans)[0] = static_cast<int>(status);
   UNPROTECT(1);
   return ans;
@@ -618,7 +618,7 @@ SEXP receiveString(SEXP socket_) {
     REprintf("%s\n",e.what());
   }
   if(status) {
-    PROTECT(ans = allocVector(STRSXP,1));
+    PROTECT(ans = Rf_allocVector(STRSXP,1));
     char* string_msg = new char[msg.size() + 1];
     if(string_msg == NULL) {
       UNPROTECT(1);
@@ -626,7 +626,7 @@ SEXP receiveString(SEXP socket_) {
     }
     memcpy(string_msg,msg.data(),msg.size());
     string_msg[msg.size()] = 0;
-    SET_STRING_ELT(ans, 0, mkChar(string_msg));
+    SET_STRING_ELT(ans, 0, Rf_mkChar(string_msg));
     UNPROTECT(1);
     return ans;
   }
@@ -648,7 +648,7 @@ SEXP receiveInt(SEXP socket_) {
       REprintf("bad integer size on remote machine.\n");
       return R_NilValue;
     }
-    PROTECT(ans = allocVector(INTSXP,1));
+    PROTECT(ans = Rf_allocVector(INTSXP,1));
     memcpy(INTEGER(ans),msg.data(),msg.size());
     UNPROTECT(1);
     return ans;
@@ -671,7 +671,7 @@ SEXP receiveDouble(SEXP socket_) {
       REprintf("bad double size on remote machine.\n");
       return R_NilValue;
     }
-    PROTECT(ans = allocVector(REALSXP,1));
+    PROTECT(ans = Rf_allocVector(REALSXP,1));
     memcpy(REAL(ans),msg.data(),msg.size());
     UNPROTECT(1);
     return ans;
@@ -686,7 +686,7 @@ SEXP set_hwm(SEXP socket_, SEXP option_value_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 
   uint64_t option_value(INTEGER(option_value_)[0]);
   try {
@@ -708,7 +708,7 @@ SEXP set_swap(SEXP socket_, SEXP option_value_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 
   int64_t option_value(INTEGER(option_value_)[0]);
   try {
@@ -727,7 +727,7 @@ SEXP set_affinity(SEXP socket_, SEXP option_value_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 
   uint64_t option_value(INTEGER(option_value_)[0]);
   try {
@@ -745,7 +745,7 @@ SEXP set_identity(SEXP socket_, SEXP option_value_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=STRSXP) { REprintf("option value must be a string.\n");return R_NilValue; }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
   const char* option_value = CHAR(STRING_ELT(option_value_,0));
   try {
     socket->setsockopt(ZMQ_IDENTITY, option_value,strlen(option_value));
@@ -762,7 +762,7 @@ SEXP subscribe(SEXP socket_, SEXP option_value_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=STRSXP) { REprintf("option value must be a string.\n");return R_NilValue; }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
   const char* option_value = CHAR(STRING_ELT(option_value_,0));
   try {
     socket->setsockopt(ZMQ_SUBSCRIBE, option_value,strlen(option_value));
@@ -779,7 +779,7 @@ SEXP unsubscribe(SEXP socket_, SEXP option_value_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=STRSXP) { REprintf("option value must be a string.\n");return R_NilValue; }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
   const char* option_value = CHAR(STRING_ELT(option_value_,0));
   try {
     socket->setsockopt(ZMQ_UNSUBSCRIBE, option_value,strlen(option_value));
@@ -796,7 +796,7 @@ SEXP set_rate(SEXP socket_, SEXP option_value_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 #if ZMQ_VERSION_MAJOR > 2
   int option_value;
 #else
@@ -819,7 +819,7 @@ SEXP set_recovery_ivl(SEXP socket_, SEXP option_value_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 #if ZMQ_VERSION_MAJOR > 2
   int option_value;
 #else
@@ -844,7 +844,7 @@ SEXP set_recovery_ivl_msec(SEXP socket_, SEXP option_value_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 
   int64_t option_value(INTEGER(option_value_)[0]);
   try {
@@ -865,7 +865,7 @@ SEXP set_mcast_loop(SEXP socket_, SEXP option_value_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=LGLSXP) { REprintf("option value must be a logical.\n");return R_NilValue; }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 
   int64_t option_value(LOGICAL(option_value_)[0]);
   try {
@@ -884,7 +884,7 @@ SEXP set_sndbuf(SEXP socket_, SEXP option_value_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 
 #if ZMQ_VERSION_MAJOR > 2
   int option_value;
@@ -908,7 +908,7 @@ SEXP set_rcvbuf(SEXP socket_, SEXP option_value_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 
 #if ZMQ_VERSION_MAJOR > 2
   int option_value;
@@ -932,7 +932,7 @@ SEXP set_linger(SEXP socket_, SEXP option_value_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 
   int option_value(INTEGER(option_value_)[0]);
   try {
@@ -950,7 +950,7 @@ SEXP set_reconnect_ivl(SEXP socket_, SEXP option_value_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 
   int option_value(INTEGER(option_value_)[0]);
   try {
@@ -968,7 +968,7 @@ SEXP set_zmq_backlog(SEXP socket_, SEXP option_value_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 
   int option_value(INTEGER(option_value_)[0]);
   try {
@@ -986,7 +986,7 @@ SEXP set_reconnect_ivl_max(SEXP socket_, SEXP option_value_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 
   int option_value(INTEGER(option_value_)[0]);
   try {
@@ -1004,7 +1004,7 @@ SEXP set_sndtimeo(SEXP socket_, SEXP option_value_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 
   int option_value(INTEGER(option_value_)[0]);
   try {
@@ -1022,7 +1022,7 @@ SEXP set_rcvtimeo(SEXP socket_, SEXP option_value_) {
   zmq::socket_t* socket = reinterpret_cast<zmq::socket_t*>(checkExternalPointer(socket_,"zmq::socket_t*"));
   if(!socket) { REprintf("bad socket object.\n");return R_NilValue; }
   if(TYPEOF(option_value_)!=INTSXP) { REprintf("option value must be an int.\n");return R_NilValue; }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1)); LOGICAL(ans)[0] = 1;
 
   int option_value(INTEGER(option_value_)[0]);
   try {
@@ -1047,8 +1047,8 @@ SEXP get_last_endpoint(SEXP socket_) {
     REprintf("%s\n",e.what());
     return R_NilValue;
   }
-  SEXP ans; PROTECT(ans = allocVector(STRSXP,1));
-  SET_STRING_ELT(ans, 0, mkChar(option_value));
+  SEXP ans; PROTECT(ans = Rf_allocVector(STRSXP,1));
+  SET_STRING_ELT(ans, 0, Rf_mkChar(option_value));
   UNPROTECT(1);
   return ans;
 }
@@ -1069,7 +1069,7 @@ SEXP get_sndtimeo(SEXP socket_) {
     REprintf("%s\n",e.what());
     return R_NilValue;
   }
-  SEXP ans; PROTECT(ans = allocVector(REALSXP,1));
+  SEXP ans; PROTECT(ans = Rf_allocVector(REALSXP,1));
   REAL(ans)[0] = static_cast<int>(option_value);
   UNPROTECT(1);
   return ans;
@@ -1091,7 +1091,7 @@ SEXP get_rcvtimeo(SEXP socket_) {
     REprintf("%s\n",e.what());
     return R_NilValue;
   }
-  SEXP ans; PROTECT(ans = allocVector(REALSXP,1));
+  SEXP ans; PROTECT(ans = Rf_allocVector(REALSXP,1));
   REAL(ans)[0] = static_cast<int>(option_value);
   UNPROTECT(1);
   return ans;
@@ -1113,7 +1113,7 @@ SEXP get_rcvmore(SEXP socket_) {
     REprintf("%s\n",e.what());
     return R_NilValue;
   }
-  SEXP ans; PROTECT(ans = allocVector(LGLSXP,1));
+  SEXP ans; PROTECT(ans = Rf_allocVector(LGLSXP,1));
   LOGICAL(ans)[0] = static_cast<int>(option_value);
   UNPROTECT(1);
   return ans;
@@ -1125,23 +1125,23 @@ SEXP get_rcvmore(SEXP socket_) {
 // #define ZMQ_TYPE 16
 
 SEXP rzmq_serialize(SEXP data, SEXP rho) {
-  static SEXP R_serialize_fun  = findVar(install("serialize"), R_GlobalEnv);
+  static SEXP R_serialize_fun  = Rf_findVar(Rf_install("serialize"), R_GlobalEnv);
   SEXP R_fcall, ans;
 
-  if(!isEnvironment(rho)) error("'rho' should be an environment");
-  PROTECT(R_fcall = lang3(R_serialize_fun, data, R_NilValue));
-  PROTECT(ans = eval(R_fcall, rho));
+  if(!Rf_isEnvironment(rho)) Rf_error("'rho' should be an environment");
+  PROTECT(R_fcall = Rf_lang3(R_serialize_fun, data, R_NilValue));
+  PROTECT(ans = Rf_eval(R_fcall, rho));
   UNPROTECT(2);
   return ans;
 }
 
 SEXP rzmq_unserialize(SEXP data, SEXP rho) {
-  static SEXP R_unserialize_fun  = findVar(install("unserialize"), R_GlobalEnv);
+  static SEXP R_unserialize_fun  = Rf_findVar(Rf_install("unserialize"), R_GlobalEnv);
   SEXP R_fcall, ans;
 
-  if(!isEnvironment(rho)) error("'rho' should be an environment");
-  PROTECT(R_fcall = lang2(R_unserialize_fun, data));
-  PROTECT(ans = eval(R_fcall, rho));
+  if(!Rf_isEnvironment(rho)) Rf_error("'rho' should be an environment");
+  PROTECT(R_fcall = Rf_lang2(R_unserialize_fun, data));
+  PROTECT(ans = Rf_eval(R_fcall, rho));
   UNPROTECT(2);
   return ans;
 }

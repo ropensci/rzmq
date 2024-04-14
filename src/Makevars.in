@@ -1,2 +1,2 @@
-PKG_CPPFLAGS = @cflags@ -I../inst
+PKG_CPPFLAGS = @cflags@ -I../inst -DR_NO_REMAP
 PKG_LIBS = @libs@
