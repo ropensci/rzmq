@@ -4,7 +4,7 @@ Version: 0.9.13
 Authors@R: c(
     person("Whit", "Armstrong", , "armstrong.whit@gmail.com", role = "aut"),
     person("Michael", "Schubert", role = "ctb"),
-    person("Jeroen", "Ooms", , "jeroen@berkeley.edu", role = c("aut", "cre"),
+    person("Jeroen", "Ooms", , "jeroenooms@gmail.com", role = c("aut", "cre"),
       comment = c(ORCID = "0000-0002-4035-0289")))
 Description: Interface to the 'ZeroMQ' lightweight messaging kernel (see <https://zeromq.org/> for more information).
 License: GPL-3
