@@ -1,18 +1,23 @@
-RWINLIB = ../windows/zeromq
-OLDLIBDIR = lib$(subst gcc,,$(COMPILED_BY))$(R_ARCH)
-PKG_CPPFLAGS = -DZMQ_STATIC \
-	-I../inst -I$(RWINLIB)/include
-	
-PKG_LIBS = \
-	-L$(RWINLIB)/$(OLDLIBDIR) \
-	-L$(RWINLIB)/lib$(R_ARCH) \
-	-L$(RWINLIB)/lib \
-	-lzmq -lsodium -lpthread -liphlpapi -lws2_32
+PKG_CONFIG_NAME = libzmq
+PKG_CONFIG ?= $(BINPREF)pkg-config
+PKG_LIBS := $(shell $(PKG_CONFIG) --libs $(PKG_CONFIG_NAME))
 
-all: clean winlibs
+ifneq ($(PKG_LIBS),)
+$(info using $(PKG_CONFIG_NAME) from Rtools)
+PKG_CPPFLAGS := -DZMQ_STATIC -I../inst $(shell $(PKG_CONFIG) --cflags $(PKG_CONFIG_NAME))
+else
+RWINLIB = ../windows/zeromq
+PKG_CPPFLAGS = -DZMQ_STATIC -I../inst -I$(RWINLIB)/include
+PKG_LIBS = -L$(RWINLIB)/lib$(subst gcc,,$(COMPILED_BY))$(R_ARCH) -L$(RWINLIB)/lib$(R_ARCH) \
+	-L$(RWINLIB)/lib -lzmq -lsodium -lpthread -liphlpapi -lws2_32
+endif
+
+all: $(SHLIB)
+
+$(OBJECTS): $(RWINLIB)
+
+$(RWINLIB):
+	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R"
 
 clean:
-	rm -f $(OBJECTS) $(SHLIB)
-
-winlibs:
-	"${R_HOME}/bin${R_ARCH_BIN}/Rscript.exe" "../tools/winlibs.R"
+	rm -f $(SHLIB) $(OBJECTS)

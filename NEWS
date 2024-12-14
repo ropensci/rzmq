@@ -1,3 +1,6 @@
+0.9.14
+  - Windows: use zeromq from Rtools if found
+  
 0.9.13
   - Compile with R_NO_REMAP
   
