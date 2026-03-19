@@ -1124,24 +1124,3 @@ SEXP get_rcvmore(SEXP socket_) {
 // #define ZMQ_EVENTS 15
 // #define ZMQ_TYPE 16
 
-SEXP rzmq_serialize(SEXP data, SEXP rho) {
-  static SEXP R_serialize_fun  = Rf_findVar(Rf_install("serialize"), R_GlobalEnv);
-  SEXP R_fcall, ans;
-
-  if(!Rf_isEnvironment(rho)) Rf_error("'rho' should be an environment");
-  PROTECT(R_fcall = Rf_lang3(R_serialize_fun, data, R_NilValue));
-  PROTECT(ans = Rf_eval(R_fcall, rho));
-  UNPROTECT(2);
-  return ans;
-}
-
-SEXP rzmq_unserialize(SEXP data, SEXP rho) {
-  static SEXP R_unserialize_fun  = Rf_findVar(Rf_install("unserialize"), R_GlobalEnv);
-  SEXP R_fcall, ans;
-
-  if(!Rf_isEnvironment(rho)) Rf_error("'rho' should be an environment");
-  PROTECT(R_fcall = Rf_lang2(R_unserialize_fun, data));
-  PROTECT(ans = Rf_eval(R_fcall, rho));
-  UNPROTECT(2);
-  return ans;
-}
