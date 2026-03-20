@@ -1,6 +1,6 @@
 Package: rzmq
 Title: R Bindings for 'ZeroMQ'
-Version: 0.9.15
+Version: 0.9.16
 Authors@R: c(
     person("Whit", "Armstrong", , "armstrong.whit@gmail.com", role = "aut"),
     person("Michael", "Schubert", role = "ctb"),
@@ -8,7 +8,7 @@ Authors@R: c(
       comment = c(ORCID = "0000-0002-4035-0289")))
 Description: Interface to the 'ZeroMQ' lightweight messaging kernel (see <https://zeromq.org/> for more information).
 License: GPL-3
-Depends: R (>= 3.1.0)
+Depends: R (>= 4.5.0)
 SystemRequirements: ZeroMQ >= 3.0.0: libzmq3-dev (deb) or zeromq-devel (rpm)
 URL: https://docs.ropensci.org/rzmq/
     https://ropensci.r-universe.dev/rzmq
