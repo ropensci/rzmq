@@ -8,7 +8,6 @@ Authors@R: c(
       comment = c(ORCID = "0000-0002-4035-0289")))
 Description: Interface to the 'ZeroMQ' lightweight messaging kernel (see <https://zeromq.org/> for more information).
 License: GPL-3
-Depends: R (>= 4.5.0)
 SystemRequirements: ZeroMQ >= 3.0.0: libzmq3-dev (deb) or zeromq-devel (rpm)
 URL: https://docs.ropensci.org/rzmq/
     https://ropensci.r-universe.dev/rzmq
