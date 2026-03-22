@@ -140,6 +140,10 @@ set.affinity <- function(socket, option.value) {
     .Call("set_affinity",socket, option.value, PACKAGE="rzmq")
 }
 
+set.conflate <- function(socket, option.value) {
+    .Call("set_conflate",socket, option.value, PACKAGE="rzmq")
+}
+
 set.identity <- function(socket, option.value) {
     .Call("set_identity",socket, option.value, PACKAGE="rzmq")
 }
